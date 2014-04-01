@@ -110,7 +110,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				continue;
 			}
 		}
-		int clearCount = grid.updateRows();
 		return false;
 	}
 
