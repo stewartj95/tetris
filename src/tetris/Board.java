@@ -75,8 +75,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	
 	public boolean cellBesideIsEmpty(int DIRECTION) {
 		int cellState = Grid.EMPTY;
-		int row = 0, column = 0;
-		int block = 0;
+		int row = 0, column = 0, block = 0;
 		while(cellState == Grid.EMPTY && block < 4) {
 			column = tetromino.getColumn(block);
 			row = tetromino.getRow(block);
