@@ -18,35 +18,15 @@ import javax.swing.Timer;
 public class Board extends JPanel implements ActionListener, KeyListener {
 	Timer timer = new Timer(100, this);
 	Grid grid = new Grid();
-	DroppedTetrominoes droppedTetrominoes = new DroppedTetrominoes(grid);
 	Shape tetromino;
 
 	int w = 40, h = 36, x = 200, y = h, velY = 2;
 	int row = 0, column = 0;
 
-	JLabel xLabel, yLabel, lblBlock1, lblBlock2, lblBlock3, lblBlock4;
-	JLabel[] debugLabels = new JLabel[4];
-
 	public Board() {
-		setFocusTraversalKeysEnabled(false); // Ignores shift and tab keys etc
+		setFocusTraversalKeysEnabled(false); 
 		setFocusable(true);
 		addKeyListener(this);
-
-		lblBlock1 = new JLabel("");
-		lblBlock2 = new JLabel("");
-		lblBlock3 = new JLabel("");
-		lblBlock4 = new JLabel("");
-
-		debugLabels[0] = lblBlock1;
-		debugLabels[1] = lblBlock2;
-		debugLabels[2] = lblBlock3;
-		debugLabels[3] = lblBlock4;
-
-		add(lblBlock1);
-		add(lblBlock2);
-		add(lblBlock3);
-		add(lblBlock4);
-
 		tetromino = new Shape(w, h);
 	}
 
@@ -65,8 +45,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				if(coordinates[row][column] == Grid.NOT_EMPTY) {
 					int x = column * w;
 					int y = row * h;
-//					System.out.println("X: " + x);
-//					System.out.println("Y: " + y);
 					g.fillRect(x, y, w, h);
 					g.drawRect(x, y, w, h);
 				}
@@ -119,21 +97,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	public void keyReleased(KeyEvent event) {}
 	public void keyTyped(KeyEvent event) {}
 	
-	public void shiftRowsDown(int howMany) {
-//		System.out.println("Shifting rows down by " + howMany);
-		for(int i=0; i<droppedTetrominoes.size(); i++) {
-			Shape tetrimino = droppedTetrominoes.get(i);
-			for(int block=0; block<4; block++) {
-				int currentRow = tetrimino.getRow(block);
-//				System.out.println("Block " + block + " old row: " + currentRow);
-				int newRow = currentRow+howMany;
-				tetrimino.setRow(block, newRow);
-				tetrimino.setY(newRow*tetrimino.getHeight());
-//				System.out.println("Block " + block + " new row: " + newRow);
-			}
-		}
-	}
-	
 	public boolean collision() {
 		for(int block=0; block<4; block++) {
 			try {
@@ -148,11 +111,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			}
 		}
 		int clearCount = grid.updateRows();
-		
-		if(clearCount > 0) {
-//			System.out.println("clearCount: " + clearCount);
-			shiftRowsDown(clearCount);
-		}
 		return false;
 	}
 
@@ -170,7 +128,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				grid.setNotEmpty(row, column);
 			}
 			
-			droppedTetrominoes.addTetromino(tetromino);
 			tetromino.randomShape();
 			y = h;
 			x = 200;

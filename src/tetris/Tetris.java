@@ -9,7 +9,7 @@ public class Tetris extends JFrame {
 		setSize(417, 792);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		setResizable(false);
+		setResizable(false);
 		Board board = new Board();
 		add(board);
 	}
