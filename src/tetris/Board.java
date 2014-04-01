@@ -37,15 +37,15 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.setColor(Color.RED);
-		
 		int[][] coordinates = grid.getGrid();
 		for(int row=0; row<21; row++) {
 			for(int column=0; column<10; column++) {
 				if(coordinates[row][column] == Grid.NOT_EMPTY) {
 					int x = column * w;
 					int y = row * h;
+					g.setColor(Color.RED);
 					g.fillRect(x, y, w, h);
+					g.setColor(Color.BLACK);
 					g.drawRect(x, y, w, h);
 				}
 			}
@@ -57,14 +57,15 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 		// Draw current tetromino
 		coordinates = tetromino.getShapeCoordinates();
 		for (int i = 0; i < 4; i++) {
-			g.setColor(tetromino.getColor());
-			
 			// Get X and Y values for current block
 			int shapeX = tetromino.blockX(i);
 			int shapeY = tetromino.blockY(i);
 			
 			// Draw block
+			g.setColor(Color.RED);
 			g.fillRect(shapeX, shapeY, w, h);
+			g.setColor(Color.BLACK);
+			g.drawRect(shapeX, shapeY, w, h);
 			row = shapeY / 36; column = shapeX / 40;
 			tetromino.setRow(i,row);
 			tetromino.setColumn(i,column);
