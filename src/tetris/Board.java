@@ -83,7 +83,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				column--;
 			else if(DIRECTION == Shape.RIGHT && column < 9)
 				column++;
-			cellState = grid.getCellState(row+1, column);
+			cellState = grid.getCellState(row, column);
 			block++;
 		}
 		return cellState == Grid.EMPTY;
