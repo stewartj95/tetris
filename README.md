@@ -7,7 +7,7 @@ KNOWN BUGS
 ==========
 
 1. Player must press a traversal key e.g. tab or alt... for keyboard input to begin registering.
-2. Rotating the line piece left once or right twice with cause the number of blocks to become 3 rather than 4.
+2. Rotating the line piece left once or right twice will cause the number of blocks to become 3 rather than 4.
 3. Game never ends
 
 =============
