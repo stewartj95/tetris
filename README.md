@@ -1,7 +1,7 @@
 tetris
 ======
 
-A Tetris clone made for fun and practice
+A Tetris clone made for fun and practice.
 
 KNOWN BUGS
 ==========
