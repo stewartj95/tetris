@@ -72,17 +72,34 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 //			System.out.println(grid);
 		}
 	}
+	
+	public boolean cellBesideIsEmpty(int DIRECTION) {
+		int cellState = Grid.EMPTY;
+		int row = 0, column = 0;
+		int block = 0;
+		while(cellState == Grid.EMPTY && block < 4) {
+			column = tetromino.getColumn(block);
+			row = tetromino.getRow(block);
+			if(DIRECTION == Shape.LEFT && column > 0)
+				column--;
+			else if(DIRECTION == Shape.RIGHT && column < 9)
+				column++;
+			cellState = grid.getCellState(row+1, column);
+			block++;
+		}
+		return cellState == Grid.EMPTY;
+	}
 
 	@Override
 	public void keyPressed(KeyEvent event) {
 		switch (event.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
-				if (x - Math.abs(w * tetromino.minX()) > 0) {
+				if (x - Math.abs(w * tetromino.minX()) > 0 && cellBesideIsEmpty(Shape.LEFT)) {
 					x -= w;
 				}
 				break;
 			case KeyEvent.VK_RIGHT:
-				if (x + w * tetromino.maxX() < getWidth()) {
+				if (x + w * tetromino.maxX() < getWidth() && cellBesideIsEmpty(Shape.RIGHT)) {
 					x += w;
 				}
 				break;
@@ -111,7 +128,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				continue;
 			}
 		}
-		int clearCount = grid.updateRows();
+		grid.updateRows();
 		return false;
 	}
 

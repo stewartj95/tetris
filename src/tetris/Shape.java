@@ -59,7 +59,21 @@ public class Shape {
 	public int blockY(int block) {
 		return calculateYPosition(coordinates[block][1]); 
 	}
-	
+//	
+//	private int calculateXPosition(int c) {
+//		int shapeX = 0;
+//		if (c < 0) {
+//			shapeX = x - width;
+//		} else if (c == 0) {
+//			shapeX = x;
+//		} else if (c == 1) {
+//			shapeX = x + width;
+//		} else if (c == 2) {
+//			shapeX = x + (2 * width);
+//		}
+//		return shapeX;
+//	}
+
 	private int calculateXPosition(int c) {
 		int shapeX = 0;
 		if (c < 0) {
