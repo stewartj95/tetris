@@ -23,6 +23,7 @@ COULD
 =====
 1. Sound effects
 2. Random Tetrominoes spawn in random rotations i.e. some might rotate once or twice before spawning
+3. Hold tetromino
 
 SHOULD
 ======
