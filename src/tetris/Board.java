@@ -6,21 +6,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Board extends JPanel implements ActionListener, KeyListener {
-	Timer timer = new Timer(1, this);
+	Timer timer = new Timer(10, this);
 	Grid grid = new Grid();
+	
 	Shape tetromino;
 
-	int w = 40, h = 36, x = 200, y = h, velY=5;
+	int w = 40, h = 36, x = 200, y = h, velY=2;
 	int row = 0, column = 0;
 
 	public Board() {
@@ -41,22 +37,25 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 		// Draw dropped pieces.
 		Cell[][] cells = grid.getCells();
 		for(int row=0; row<21; row++) {
+			g.setColor(Color.BLACK);
+			g.drawRect(0, row*h, getWidth(), 0);
 			for(int column=0; column<10; column++) {
 				Cell cell = cells[row][column];
+				g.setColor(Color.BLACK);
+				g.drawRect(column*w, row*h, 0, getHeight());
 				if(cell.getState() == Cell.NOT_EMPTY) {
 					int x = column * w;
 					int y = row * h;
 					g.setColor(cell.getColor());
 					g.fillRect(x, y, w, h);
 					g.setColor(Color.BLACK);
-					g.drawRect(x, y, w, h);
 				}
 			}
 		}
 		
 		int row = 0;
 		int column = 0;
-
+		
 		// Draw current tetromino
 		for (int i = 0; i < 4; i++) {
 //			System.out.println("Drawing block " + i);
@@ -68,11 +67,10 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			g.setColor(tetromino.getColor());
 			g.fillRect(shapeX, shapeY, w, h);
 			g.setColor(Color.BLACK);
-			g.drawRect(shapeX, shapeY, w, h);
 			row = shapeY / 36; column = shapeX / 40;
 			tetromino.setRow(i,row);
 			tetromino.setColumn(i,column);
-//			System.out.println(grid);
+			System.out.println(grid);
 		}
 		
 		// Draw bottom border
@@ -108,16 +106,16 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				}
 				break;
 			case KeyEvent.VK_Z:
-				tetromino.rotate(Shape.LEFT);
+				tetromino.rotate(Shape.RIGHT);
 				break;
 			case KeyEvent.VK_X:
-				tetromino.rotate(Shape.RIGHT);
+				tetromino.rotate(Shape.LEFT);
 				break;
 			case KeyEvent.VK_UP:
 				tetromino.rotate(Shape.LEFT);
 				break;
-			case KeyEvent.VK_ENTER:
-				start();
+			case KeyEvent.VK_SPACE:
+				velY = 20;
 				break;
 		}
 	}
@@ -145,13 +143,13 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	@Override
 	// GAME LOOP
 	// IF current tetromino can go to next row THEN 
-	// Y coordinates of current tetromino are updated. 
+	// Update Y coordinates of current tetromino are updated. 
 	// OTHERWISE 
 	// Set the state of the cells the tetromino currently 
 	// occupies to NOT_EMPTY. Then generate a new tetromino and set 
 	// of it to the coordinates to the top of the board.
 	public void actionPerformed(ActionEvent event) {
-		if (y + tetromino.maxY() * h < (getHeight()-60) && !collision()) {
+		if (y + tetromino.maxY() * h < (getHeight()-40) && !collision()) {
 			y += velY;
 		} else {
 			// Mark non-empty cells
@@ -163,11 +161,9 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				cell.setState(Cell.NOT_EMPTY);
 				cell.setColor(tetromino.getColor());
 			}
-			for(int i=0; i<30; i++) {
-				System.out.println("\n");
-			}
 			tetromino.randomShape();
 			y = h;
+			velY = 2;
 			x = 200;
 		}
 		tetromino.setX(x);

@@ -8,8 +8,8 @@ public class Grid {
 	private Cell cells[][];
 	
 	public Grid() {
-		cells = new Cell[21][10];
-		for(int row = 0; row < 21; row++) {
+		cells = new Cell[22][10];
+		for(int row = 0; row < 22; row++) {
 			for (int column = 0; column < 10; column++) {
 				cells[row][column] = new Cell(Cell.EMPTY);
 			}
@@ -27,7 +27,7 @@ public class Grid {
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		for(int row=0; row<21; row++) {
+		for(int row=0; row<22; row++) {
 			for(int column=0; column<10; column++) {
 				sb.append(cells[row][column].getState() + "\t");
 			}
