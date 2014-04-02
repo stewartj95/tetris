@@ -7,7 +7,6 @@ BUGS
 ==========
 
 1. Game never ends (no end condition)
-2. Game does not consider possible collisions for rotations, i.e. the new coordinates after rotating to the left may be out of bounds, which currently throws an IndexOutOfBoundsException.
 
 =============
 TO IMPLEMENT
