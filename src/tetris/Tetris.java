@@ -16,13 +16,13 @@ public class Tetris extends JFrame implements KeyListener{
 	
 	public Tetris() {
 		setTitle("Tetris");
-		setSize(407, 792);
+		setSize(407, 786);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setLayout(new BorderLayout());
 		addKeyListener(this);
-		startLbl = new JLabel("Press TAB and ENTER to start.");
+		startLbl = new JLabel("Press ENTER to start.");
 		add(startLbl);
 		board = new Board();
 	}

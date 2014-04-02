@@ -115,13 +115,24 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				tetromino.rotate(Shape.LEFT);
 				break;
 			case KeyEvent.VK_SPACE:
-				velY = 20;
+				velY = 30;
 				break;
+			case KeyEvent.VK_ESCAPE:
+				timer.stop();
+				grid = new Grid();
+				start();
+				break;
+			case KeyEvent.VK_DOWN:
+				velY = 30;
+				break;
+
 		}
 	}
 
-	public void keyReleased(KeyEvent event) {}
-	public void keyTyped(KeyEvent event) {}
+	public void keyReleased(KeyEvent event) {
+	}
+	public void keyTyped(KeyEvent event) {
+	}
 	
 	public boolean collision() {
 		for(int block=0; block<4; block++) {
