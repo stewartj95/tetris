@@ -6,7 +6,7 @@ A Tetris clone made for fun and practice.
 BUGS
 ==========
 
-1. Game never ends (no end condition)
+No significant bugs at the moment.
 
 =============
 TO IMPLEMENT
@@ -16,7 +16,6 @@ MUST
 ====
 1. Main Menu
 2. Scoring System
-3. Game over condition
 
 COULD
 =====
