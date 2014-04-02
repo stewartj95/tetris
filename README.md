@@ -18,14 +18,10 @@ MUST
 ====
 1. Main Menu
 2. Scoring System
+3. Game over condition
 
 COULD
 =====
 1. Sound effects
 2. Random Tetrominoes spawn in random rotations i.e. some might rotate once or twice before spawning
 3. Hold tetromino
-
-SHOULD
-======
-1. Smoother animations
-2. Different colours for different tetrimino pieces
