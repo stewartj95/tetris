@@ -3,7 +3,7 @@ import java.awt.Color;
 import java.util.Random;
 
 public class Shape {
-	enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, LSHAPE, LINE, SQUARE};
+	enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, REVERSESSHAPE, LSHAPE, REVERSELSHAPE, LINE, SQUARE};
 	public static final int RIGHT = 0, LEFT = 1, DESTROYED = 9999;
 	int[][] coordinates;
 	int[][] blockCoordinates;
@@ -21,6 +21,27 @@ public class Shape {
 		color = Color.RED;
 		blockCoordinates = new int[4][2];
 	}
+	
+	public void newShape(Tetrominoes shape) {
+		int[][][] coordinatesTable = {
+				{ {0,0}, {0,0}, {0,0}, {0,0} },	   // NO SHAPE 
+				{ {-1,0}, {0,0}, {1,0}, {0,1} },   // T SHAPE
+				{ {-1,1}, {-1,0}, {0,0}, {0,-1} }, // S SHAPE
+				{ {1,1}, {1,0}, {0,0}, {0,-1} },   // REVERSE S SHAPE
+				{ {-1,1}, {-1,0}, {0,0}, {1,0} },  // L SHAPE
+				{ {1,1}, {1,0}, {0,0}, {-1,0}},    // REVERSE L SHAPE
+				{ {0,-1}, {0,0}, {0,1}, {0,2} },   // LINE SHAPE
+				{ {0,-1}, {0,0}, {1,0}, {1,-1} }   // SQUARE SHAPE
+		};
+		
+		for(int i=0; i<4; i++) {
+			coordinates[i][0] = coordinatesTable[shape.ordinal()][i][0];
+			coordinates[i][1] = coordinatesTable[shape.ordinal()][i][1];
+		}
+
+		currentShape = shape;
+	}
+
 	
 	public void setColor(Color color) {
 		this.color = color;
@@ -80,24 +101,7 @@ public class Shape {
 		return shapeY;
 	}
 	
-	public void newShape(Tetrominoes shape) {
-		int[][][] coordinatesTable = {
-				{ {0,0}, {0,0}, {0,0}, {0,0} },	  // NO SHAPE 
-				{ {-1,0}, {0,0}, {1,0}, {0,1} },  // T SHAPE
-				{ {-1,1}, {-1,0}, {0,0}, {0,-1} },// S SHAPE
-				{ {-1,1}, {-1,0}, {0,0}, {1,0} }, // L SHAPE
-				{ {0,-1}, {0,0}, {0,1}, {0,2} },  // LINE SHAPE
-				{ {0,-1}, {0,0}, {1,0}, {1,-1} }  // SQUARE SHAPE
-		};
 		
-		for(int i=0; i<4; i++) {
-			coordinates[i][0] = coordinatesTable[shape.ordinal()][i][0];
-			coordinates[i][1] = coordinatesTable[shape.ordinal()][i][1];
-		}
-
-		currentShape = shape;
-	}
-	
 	public void rotate(int DIRECTION) {
 		if(currentShape == Tetrominoes.LINE) {
 			if(!rotated) {
@@ -108,6 +112,9 @@ public class Shape {
 				rotated = false;
 				return;
 			}
+		}
+		if(currentShape == Tetrominoes.SQUARE) {
+			return;
 		}
 		for(int i=0; i<4; i++) {
 			int x = coordinates[i][0];
@@ -197,7 +204,7 @@ public class Shape {
 	
 	public void randomShape() {
 		Random r = new Random();
-		int index = r.nextInt(5)+1;
+		int index = r.nextInt(Tetrominoes.values().length-2)+1;
 		switch (r.nextInt(3)) {
 			case 0:
 				setColor(Color.RED);
