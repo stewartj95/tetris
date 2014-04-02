@@ -36,19 +36,18 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 		
 		// Draw dropped pieces.
 		Cell[][] cells = grid.getCells();
-		for(int row=0; row<21; row++) {
-			g.setColor(Color.BLACK);
-			g.drawRect(0, row*h, getWidth(), 0);
+		for(int row=0; row<22; row++) {
+//			g.setColor(Color.BLACK);
+//			g.drawRect(0, row*h, getWidth(), 0);
 			for(int column=0; column<10; column++) {
 				Cell cell = cells[row][column];
-				g.setColor(Color.BLACK);
-				g.drawRect(column*w, row*h, 0, getHeight());
 				if(cell.getState() == Cell.NOT_EMPTY) {
 					int x = column * w;
 					int y = row * h;
 					g.setColor(cell.getColor());
 					g.fillRect(x, y, w, h);
 					g.setColor(Color.BLACK);
+					g.drawRect(x, y, w, h);
 				}
 			}
 		}
@@ -67,10 +66,11 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			g.setColor(tetromino.getColor());
 			g.fillRect(shapeX, shapeY, w, h);
 			g.setColor(Color.BLACK);
+			g.drawRect(shapeX, shapeY, w, h);
 			row = shapeY / 36; column = shapeX / 40;
 			tetromino.setRow(i,row);
 			tetromino.setColumn(i,column);
-			System.out.println(grid);
+//			System.out.println(grid);
 		}
 		
 		// Draw bottom border
