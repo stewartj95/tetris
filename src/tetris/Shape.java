@@ -1,16 +1,19 @@
 package tetris;
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Shape {
 	enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, REVERSESSHAPE, LSHAPE, REVERSELSHAPE, LINE, SQUARE};
-	public static final int RIGHT = 0, LEFT = 1, DESTROYED = 9999;
+	public static final int RIGHT = 0, LEFT = 1;
 	int[][] coordinates;
 	int[][] blockCoordinates;
 	Tetrominoes currentShape;
 	private int x, y, row, column, width, height;
 	private Color color;
 	private boolean rotated = false;
+	private HashMap<Tetrominoes, int[][][]> rotationCoords;
+	private int rotationIndex = 0;
 	
 	public Shape(int width, int height) {
 		this.width = width;
@@ -20,26 +23,103 @@ public class Shape {
 		currentShape = shape;
 		color = Color.RED;
 		blockCoordinates = new int[4][2];
+		loadRotationCoordinates();
+	}
+
+	public void rotate(int DIRECTION) {
+		int oldRotationIndex = rotationIndex;
+		if(DIRECTION == Shape.RIGHT) {
+			rotationIndex++;
+		} else if (DIRECTION == Shape.LEFT) {
+			rotationIndex--;
+		}
+		
+		int[][] newCoordinates = new int[4][2];
+		
+		try {
+			newCoordinates = rotationCoords.get(currentShape)[rotationIndex];
+		} catch (IndexOutOfBoundsException exception) {
+			if(DIRECTION == Shape.LEFT) {
+				rotationIndex = rotationCoords.get(currentShape).length-1;
+			} else if (DIRECTION == Shape.RIGHT) {
+				rotationIndex = 0;
+			}
+			newCoordinates = rotationCoords.get(currentShape)[rotationIndex];
+		}
+		
+		// Check if this would be a legal rotation, i.e. it would not make 
+		// any blocks leave the grid.
+		for (int i = 0; i < newCoordinates.length; i++) {
+			int column = calculateXPosition(newCoordinates[i][0]) / width;
+			if(column < 0 || column > 9) {
+				// This would be an illegal rotation, so do not allow it.
+				rotationIndex = oldRotationIndex;
+				return;
+			}
+		}
+		
+		coordinates = newCoordinates;
+		
+	}
+
+	private void loadRotationCoordinates() {
+		// ALL ROTATIONS FROM 0, 1, ..., N ARE CLOCKWISE.
+		rotationCoords = new HashMap<>();
+		int[][][] TSHAPEcoords = {
+				{{-1,0}, {0,0}, {1,0}, {0,1}},  // DEFAULT
+				{{0,1}, {0,0}, {0,-1}, {1,0}},  // 90 DEG 
+				{{1,0}, {0,0}, {-1,0}, {0,-1}}, // 180 DEG  
+				{{0,-1}, {0,0}, {0,1}, {-1,0}}, // 270 DEG  
+		};
+		rotationCoords.put(Tetrominoes.TSHAPE, TSHAPEcoords);
+		
+		int[][][] SSHAPEcoords = {
+				{ {-1,1}, {-1,0}, {0,0}, {0,-1} }, // DEFAULT
+				{ {1,1}, {0,1}, {0,0}, {-1,0} },   // 90 DEG 
+		};
+		rotationCoords.put(Tetrominoes.SSHAPE, SSHAPEcoords);
+		
+		int[][][] REVERSESSHAPEcoords = {
+				{ {1,1}, {1,0}, {0,0}, {0,-1} },  // DEFAULT
+				{ {1,-1}, {0,-1}, {0,0}, {1,0} }, // 90 DEG
+		};
+		rotationCoords.put(Tetrominoes.REVERSESSHAPE, REVERSESSHAPEcoords);
+		
+		int[][][] LSHAPEcoords = {
+				{ {-1,1}, {-1,0}, {0,0}, {1,0} },  // DEFAULT
+				{ {1,1}, {0,1}, {0,0}, {0,-1}  },  // 90 DEG
+				{ {1,-1}, {1,0}, {0,0}, {-1,0} },  // 180 DEG
+				{ {-1,-1}, {0,-1}, {0,0}, {0,1} }  // 270 DEG
+		};
+		rotationCoords.put(Tetrominoes.LSHAPE, LSHAPEcoords);
+		
+		int[][][] REVERSELSHAPEcoords = {
+				{ {1,1}, {1,0}, {0,0}, {-1,0}},    // DEFAULT
+				{ {1,-1}, {0,-1}, {0,0}, {0,1}},   // 90 DEG  
+				{ {-1,-1}, {-1,0}, {0,0}, {1,0}},  // 180 DEG  
+				{ {-1,1}, {0,1}, {0,0}, {0,-1}},   // 270 DEG  
+		};
+		rotationCoords.put(Tetrominoes.REVERSELSHAPE, REVERSELSHAPEcoords);
+		
+		int[][][] LINESHAPEcoords = {
+				{ {0,-1}, {0,0}, {0,1}, {0,2} },   // DEFAULT
+				{ {-1,0}, {0,0}, {1,0}, {2,0} },   // 90 DEG
+		};
+		rotationCoords.put(Tetrominoes.LINE, LINESHAPEcoords);
+		
+		int[][][] SQUARESHAPEcoords = {
+				{ {0,-1}, {0,0}, {1,0}, {1,-1} }   // DEFAULT 
+		};
+		
 	}
 	
 	public void newShape(Tetrominoes shape) {
-		int[][][] coordinatesTable = {
-				{ {0,0}, {0,0}, {0,0}, {0,0} },	   // NO SHAPE 
-				{ {-1,0}, {0,0}, {1,0}, {0,1} },   // T SHAPE
-				{ {-1,1}, {-1,0}, {0,0}, {0,-1} }, // S SHAPE
-				{ {1,1}, {1,0}, {0,0}, {0,-1} },   // REVERSE S SHAPE
-				{ {-1,1}, {-1,0}, {0,0}, {1,0} },  // L SHAPE
-				{ {1,1}, {1,0}, {0,0}, {-1,0}},    // REVERSE L SHAPE
-				{ {0,-1}, {0,0}, {0,1}, {0,2} },   // LINE SHAPE
-				{ {0,-1}, {0,0}, {1,0}, {1,-1} }   // SQUARE SHAPE
-		};
-		
-		for(int i=0; i<4; i++) {
-			coordinates[i][0] = coordinatesTable[shape.ordinal()][i][0];
-			coordinates[i][1] = coordinatesTable[shape.ordinal()][i][1];
-		}
-
+		coordinates = rotationCoords.get(shape)[0];
 		currentShape = shape;
+	}
+	
+	public int[][] getRotationCoordinates(Tetrominoes shape, int DIRECTION) {
+		return null;
 	}
 
 	
@@ -102,34 +182,6 @@ public class Shape {
 	}
 	
 		
-	public void rotate(int DIRECTION) {
-		if(currentShape == Tetrominoes.LINE) {
-			if(!rotated) {
-				DIRECTION = RIGHT;
-				rotated = true;
-			} else {
-				newShape(Tetrominoes.LINE);
-				rotated = false;
-				return;
-			}
-		}
-		if(currentShape == Tetrominoes.SQUARE) {
-			return;
-		}
-		for(int i=0; i<4; i++) {
-			int x = coordinates[i][0];
-			int y = coordinates[i][1];
-			
-			if(DIRECTION == RIGHT) {
-				coordinates[i][0] = y;
-				coordinates[i][1] = -x;
-			} else if(DIRECTION == LEFT) {
-				coordinates[i][0] = -y;
-				coordinates[i][1] = x;
-			}
-		}
-	}
-	
 	public void setRow(int block, int row) {
 		blockCoordinates[block][0] = row;
 	}
@@ -223,7 +275,8 @@ public class Shape {
 				break;
 		}
 		rotated = false;
-		newShape(Tetrominoes.values()[index]);
+		rotationIndex = 0;
+		newShape(Tetrominoes.values()[1]);
 	}
 		
 }

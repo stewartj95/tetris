@@ -7,8 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
+import tetris.Shape.Tetrominoes;
 
 public class Board extends JPanel implements ActionListener, KeyListener {
 	Timer timer = new Timer(10, this);
@@ -18,11 +21,18 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 
 	int w = 40, h = 36, x = 200, y = h, velY=2;
 	int row = 0, column = 0;
-
+	JLabel[] debugLabels = {new JLabel("Block 1 row:    column:    "),
+							new JLabel("Block 2 row:    column:    "),
+							new JLabel("Block 3 row:    column:    "),
+							new JLabel("Block 4 row:    column:    ")};
+	
 	public Board() {
 		setFocusTraversalKeysEnabled(false); 
 		setFocusable(true);
 		addKeyListener(this);
+		for(JLabel label : debugLabels) {
+			add(label);
+		}
 		tetromino = new Shape(w, h);
 	}
 
@@ -37,8 +47,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 		// Draw dropped pieces.
 		Cell[][] cells = grid.getCells();
 		for(int row=0; row<22; row++) {
-//			g.setColor(Color.BLACK);
-//			g.drawRect(0, row*h, getWidth(), 0);
 			for(int column=0; column<10; column++) {
 				Cell cell = cells[row][column];
 				if(cell.getState() == Cell.NOT_EMPTY) {
@@ -68,6 +76,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.BLACK);
 			g.drawRect(shapeX, shapeY, w, h);
 			row = shapeY / 36; column = shapeX / 40;
+			debugLabels[i].setText("Block "+i+" row: "+row+" column: " + column);
 			tetromino.setRow(i,row);
 			tetromino.setColumn(i,column);
 //			System.out.println(grid);
@@ -94,6 +103,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent event) {
+		int[][] oldCoordinates = tetromino.getShapeCoordinates();
 		switch (event.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
 				if (x - Math.abs(w * tetromino.minX()) > 0 && cellBesideIsEmpty(Shape.LEFT)) {
@@ -125,8 +135,18 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			case KeyEvent.VK_DOWN:
 				velY = 30;
 				break;
-
 		}
+//		int[] newColumns = new int[4];
+//		for (int i = 0; i < newColumns.length; i++) {
+//			int column = tetromino.blockX(i)/tetromino.getWidth();
+//			if(column < 0 || column > 9) {
+//				// Illegal rotation, so revert back to old coordinates.
+//				System.out.println("ILLEGAL ROTATION");
+//				Tetrominoes shape = tetromino.getShape();
+//				tetromino.newShape(shape);
+//				break;
+//			}
+//		}
 	}
 
 	public void keyReleased(KeyEvent event) {
@@ -160,7 +180,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	// occupies to NOT_EMPTY. Then generate a new tetromino and set 
 	// of it to the coordinates to the top of the board.
 	public void actionPerformed(ActionEvent event) {
-		if (y + tetromino.maxY() * h < (getHeight()-40) && !collision()) {
+		if (y + tetromino.maxY() * h < (getHeight()-h) && !collision()) {
 			y += velY;
 		} else {
 			// Mark non-empty cells
