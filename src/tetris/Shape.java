@@ -197,7 +197,7 @@ public class Shape {
 	
 	public void randomShape() {
 		Random r = new Random();
-		int index = r.nextInt(4)+1;
+		int index = r.nextInt(5)+1;
 		switch (r.nextInt(3)) {
 			case 0:
 				setColor(Color.RED);
