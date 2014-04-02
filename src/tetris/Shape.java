@@ -81,7 +81,7 @@ public class Shape {
 		
 		int[][][] REVERSESSHAPEcoords = {
 				{ {1,1}, {1,0}, {0,0}, {0,-1} },  // DEFAULT
-				{ {1,-1}, {0,-1}, {0,0}, {1,0} }, // 90 DEG
+				{ {1,-1}, {0,-1}, {0,0}, {-1,0} }, // 90 DEG
 		};
 		rotationCoords.put(Tetrominoes.REVERSESSHAPE, REVERSESSHAPEcoords);
 		
@@ -276,7 +276,7 @@ public class Shape {
 		}
 		rotated = false;
 		rotationIndex = 0;
-		newShape(Tetrominoes.values()[1]);
+		newShape(Tetrominoes.values()[index]);
 	}
 		
 }
