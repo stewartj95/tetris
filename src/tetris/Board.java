@@ -143,17 +143,6 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				velY = 30;
 				break;
 		}
-//		int[] newColumns = new int[4];
-//		for (int i = 0; i < newColumns.length; i++) {
-//			int column = tetromino.blockX(i)/tetromino.getWidth();
-//			if(column < 0 || column > 9) {
-//				// Illegal rotation, so revert back to old coordinates.
-//				System.out.println("ILLEGAL ROTATION");
-//				Tetrominoes shape = tetromino.getShape();
-//				tetromino.newShape(shape);
-//				break;
-//			}
-//		}
 	}
 
 	public void keyReleased(KeyEvent event) {
