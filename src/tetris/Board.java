@@ -16,11 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Board extends JPanel implements ActionListener, KeyListener {
-	Timer timer = new Timer(100, this);
+	Timer timer = new Timer(1, this);
 	Grid grid = new Grid();
 	Shape tetromino;
 
-	int w = 40, h = 36, x = 200, y = h, velY = 2;
+	int w = 40, h = 36, x = 200, y = h, velY=5;
 	int row = 0, column = 0;
 
 	public Board() {
@@ -37,13 +37,16 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		int[][] coordinates = grid.getGrid();
+		
+		// Draw dropped pieces.
+		Cell[][] cells = grid.getCells();
 		for(int row=0; row<21; row++) {
 			for(int column=0; column<10; column++) {
-				if(coordinates[row][column] == Grid.NOT_EMPTY) {
+				Cell cell = cells[row][column];
+				if(cell.getState() == Cell.NOT_EMPTY) {
 					int x = column * w;
 					int y = row * h;
-					g.setColor(Color.RED);
+					g.setColor(cell.getColor());
 					g.fillRect(x, y, w, h);
 					g.setColor(Color.BLACK);
 					g.drawRect(x, y, w, h);
@@ -55,14 +58,14 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 		int column = 0;
 
 		// Draw current tetromino
-		coordinates = tetromino.getShapeCoordinates();
 		for (int i = 0; i < 4; i++) {
+//			System.out.println("Drawing block " + i);
 			// Get X and Y values for current block
 			int shapeX = tetromino.blockX(i);
 			int shapeY = tetromino.blockY(i);
 			
 			// Draw block
-			g.setColor(Color.RED);
+			g.setColor(tetromino.getColor());
 			g.fillRect(shapeX, shapeY, w, h);
 			g.setColor(Color.BLACK);
 			g.drawRect(shapeX, shapeY, w, h);
@@ -71,22 +74,24 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			tetromino.setColumn(i,column);
 //			System.out.println(grid);
 		}
+		
+		// Draw bottom border
 	}
 	
 	public boolean cellBesideIsEmpty(int DIRECTION) {
-		int cellState = Grid.EMPTY;
+		int cellState = Cell.EMPTY;
 		int row = 0, column = 0, block = 0;
-		while(cellState == Grid.EMPTY && block < 4) {
+		while(cellState == Cell.EMPTY && block < 4) {
 			column = tetromino.getColumn(block);
 			row = tetromino.getRow(block);
 			if(DIRECTION == Shape.LEFT && column > 0)
 				column--;
 			else if(DIRECTION == Shape.RIGHT && column < 9)
 				column++;
-			cellState = grid.getCellState(row, column);
+			cellState = grid.getCell(row, column).getState();
 			block++;
 		}
-		return cellState == Grid.EMPTY;
+		return cellState == Cell.EMPTY;
 	}
 
 	@Override
@@ -101,6 +106,12 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				if (x + w * tetromino.maxX() < getWidth() && cellBesideIsEmpty(Shape.RIGHT)) {
 					x += w;
 				}
+				break;
+			case KeyEvent.VK_Z:
+				tetromino.rotate(Shape.LEFT);
+				break;
+			case KeyEvent.VK_X:
+				tetromino.rotate(Shape.RIGHT);
 				break;
 			case KeyEvent.VK_UP:
 				tetromino.rotate(Shape.LEFT);
@@ -119,8 +130,8 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			try {
 				int row = tetromino.getRow(block);
 				int column = tetromino.getColumn(block);
-				int nextCellState = grid.getCellState(row+1, column);
-				if(nextCellState == Grid.NOT_EMPTY) {
+				int nextCellState = grid.getCell(row+1, column).getState();
+				if(nextCellState == Cell.NOT_EMPTY) {
 					return true;
 				}
 			} catch (IndexOutOfBoundsException exception) {
@@ -132,19 +143,29 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	}
 
 	@Override
-	// Game loop
+	// GAME LOOP
+	// IF current tetromino can go to next row THEN 
+	// Y coordinates of current tetromino are updated. 
+	// OTHERWISE 
+	// Set the state of the cells the tetromino currently 
+	// occupies to NOT_EMPTY. Then generate a new tetromino and set 
+	// of it to the coordinates to the top of the board.
 	public void actionPerformed(ActionEvent event) {
 		if (y + tetromino.maxY() * h < (getHeight()-60) && !collision()) {
-			y += h;
+			y += velY;
 		} else {
-			// Mark non empty cells
+			// Mark non-empty cells
 			int row = 0, column = 0;
 			for(int block=0; block<4; block++) {
 				row = tetromino.getRow(block);
 				column = tetromino.getColumn(block);
-				grid.setNotEmpty(row, column);
+				Cell cell = grid.getCell(row, column);
+				cell.setState(Cell.NOT_EMPTY);
+				cell.setColor(tetromino.getColor());
 			}
-			
+			for(int i=0; i<30; i++) {
+				System.out.println("\n");
+			}
 			tetromino.randomShape();
 			y = h;
 			x = 200;

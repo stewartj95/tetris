@@ -10,6 +10,7 @@ public class Shape {
 	Tetrominoes currentShape;
 	private int x, y, row, column, width, height;
 	private Color color;
+	private boolean rotated = false;
 	
 	public Shape(int width, int height) {
 		this.width = width;
@@ -19,15 +20,6 @@ public class Shape {
 		currentShape = shape;
 		color = Color.RED;
 		blockCoordinates = new int[4][2];
-	}
-	
-	public void destroyBlock(int block) {
-		coordinates[block][0] = DESTROYED;
-		coordinates[block][1] = DESTROYED;
-	}
-	
-	public boolean isDestroyed(int block) {
-		return coordinates[block][0] == DESTROYED;
 	}
 	
 	public void setColor(Color color) {
@@ -59,20 +51,6 @@ public class Shape {
 	public int blockY(int block) {
 		return calculateYPosition(coordinates[block][1]); 
 	}
-//	
-//	private int calculateXPosition(int c) {
-//		int shapeX = 0;
-//		if (c < 0) {
-//			shapeX = x - width;
-//		} else if (c == 0) {
-//			shapeX = x;
-//		} else if (c == 1) {
-//			shapeX = x + width;
-//		} else if (c == 2) {
-//			shapeX = x + (2 * width);
-//		}
-//		return shapeX;
-//	}
 
 	private int calculateXPosition(int c) {
 		int shapeX = 0;
@@ -121,12 +99,20 @@ public class Shape {
 	}
 	
 	public void rotate(int DIRECTION) {
+		if(currentShape == Tetrominoes.LINE) {
+			if(!rotated) {
+				DIRECTION = RIGHT;
+				rotated = true;
+			} else {
+				newShape(Tetrominoes.LINE);
+				rotated = false;
+				return;
+			}
+		}
 		for(int i=0; i<4; i++) {
 			int x = coordinates[i][0];
 			int y = coordinates[i][1];
-			if(currentShape == Tetrominoes.LINE) {
-				DIRECTION = RIGHT;
-			}
+			
 			if(DIRECTION == RIGHT) {
 				coordinates[i][0] = y;
 				coordinates[i][1] = -x;
@@ -229,6 +215,7 @@ public class Shape {
 				setColor(Color.RED);
 				break;
 		}
+		rotated = false;
 		newShape(Tetrominoes.values()[index]);
 	}
 		

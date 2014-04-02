@@ -1,32 +1,27 @@
 package tetris;
 
+import java.awt.Color;
+
 public class Grid {
 	
-	public static final int EMPTY = 0;
-	public static final int NOT_EMPTY = 1;
 	
-	private int coordinates[][];
-	private int currentRow;
+	private Cell cells[][];
 	
 	public Grid() {
-		coordinates = new int[21][10];
+		cells = new Cell[21][10];
 		for(int row = 0; row < 21; row++) {
 			for (int column = 0; column < 10; column++) {
-				coordinates[row][column] = EMPTY;
+				cells[row][column] = new Cell(Cell.EMPTY);
 			}
 		}
 	}
 	
-	public int[][] getGrid() {
-		return this.coordinates;
+	public Cell[][] getCells() {
+		return this.cells;
 	}
 	
-	public void setNotEmpty(int row, int column) {
-		coordinates[row][column] = NOT_EMPTY;
-	}
-	
-	public void setEmpty(int row, int column) {
-		coordinates[row][column] = EMPTY;
+	public Cell getCell(int row, int column) {
+		return cells[row][column];
 	}
 	
 	@Override
@@ -34,7 +29,7 @@ public class Grid {
 		StringBuffer sb = new StringBuffer();
 		for(int row=0; row<21; row++) {
 			for(int column=0; column<10; column++) {
-				sb.append(getCellState(row, column) + "\t");
+				sb.append(cells[row][column].getState() + "\t");
 			}
 			sb.append("\n");
 		}
@@ -44,51 +39,48 @@ public class Grid {
 		return sb.toString();
 	}
 	
-	public int getCellState(int row, int column) {
-		return coordinates[row][column];
-	}
-	
+	// Checks if a row is clear.
 	public boolean isClearRow(int row) {
 		int clearCount = 0;
 		for(int column=0; column<10; column++) {
-			if(coordinates[row][column] == 0) {
+			if(cells[row][column].getState() == Cell.EMPTY) {
 				clearCount++;
 			}
 		}
 		return clearCount == 10;
 	}
 	
+	// Clears a row by setting each cell state to EMPTY.
 	public void clearRow(int r) {
 		// Set current row to row-1
-//		for(int r=row; r>0; r--) {
-//			for(int column = 0; column < 10; column++) {
-//				coordinates[row][column] = coordinates[row-1][column];
-//			}	
-//		}
-		
 		for (int column=0; column<10; column++) {
-			coordinates[r][column] = 0;
+			cells[r][column].setState(Cell.EMPTY);
+			cells[r][column].setColor(null);
 		}
 		
 		for(int row=r; row>0; row--) {
 			for (int column=0; column<10; column++) {
-				coordinates[row][column] = coordinates[row-1][column];
+				Cell cell = cells[row][column];
+				Cell above = cells[row-1][column];
+				cell.setState(above.getState());
+				cell.setColor(above.getColor());
 			}
 		}
-		
 	}
 	
+	// Checks for full rows. If it finds a full row it clears it 
+	// and shifts the contents every other row down one.
 	public int updateRows() {
-		int total = 0;
+		int fullCellCount = 0;
 		int clearCount = 0;
 		for(int row=20; row>0; row--) {
-			total = 0;
+			fullCellCount = 0;
 			for(int column=0; column<10; column++) {
-				if(coordinates[row][column] == NOT_EMPTY) {
-					total++;
+				if(cells[row][column].getState() == Cell.NOT_EMPTY) {
+					fullCellCount++;
 				}
 			}
-			if(total == 10) {
+			if(fullCellCount == 10) {
 				clearRow(row);
 				clearCount++;
 			}
