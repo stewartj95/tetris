@@ -1,6 +1,8 @@
 package tetris;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,8 +12,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-
-import tetris.Shape.Tetrominoes;
 
 public class Board extends JPanel implements ActionListener, KeyListener {
 	Timer timer = new Timer(10, this);
@@ -25,20 +25,27 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 							new JLabel("Block 2 row:    column:    "),
 							new JLabel("Block 3 row:    column:    "),
 							new JLabel("Block 4 row:    column:    ")};
+	JLabel statusLabel;
 	
 	public Board() {
 		setFocusTraversalKeysEnabled(false); 
 		setFocusable(true);
 		addKeyListener(this);
-		for(JLabel label : debugLabels) {
-			add(label);
-		}
+		setLayout(new BorderLayout());
+//		for(JLabel label : debugLabels) {
+//			add(label);
+//		}
 		tetromino = new Shape(w, h);
+		statusLabel = new JLabel();
+		statusLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
+		add(statusLabel, BorderLayout.CENTER);
 	}
 
 	public void start() {
 		tetromino.randomShape();
+		statusLabel.setText("");
 		timer.start();
+		velY = 2;
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -76,7 +83,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			g.setColor(Color.BLACK);
 			g.drawRect(shapeX, shapeY, w, h);
 			row = shapeY / 36; column = shapeX / 40;
-			debugLabels[i].setText("Block "+i+" row: "+row+" column: " + column);
+//			debugLabels[i].setText("Block "+i+" row: "+row+" column: " + column);
 			tetromino.setRow(i,row);
 			tetromino.setColumn(i,column);
 //			System.out.println(grid);
@@ -196,6 +203,11 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			y = h;
 			velY = 2;
 			x = 200;
+			if(grid.getCell(1, 5).getState() == Cell.NOT_EMPTY) {
+				// GAME OVER
+				timer.stop();
+				statusLabel.setText("GAME OVER! Press ESC to restart.");
+			}
 		}
 		tetromino.setX(x);
 		tetromino.setY(y);

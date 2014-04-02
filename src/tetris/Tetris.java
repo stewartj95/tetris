@@ -1,6 +1,7 @@
 package tetris;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -23,6 +24,7 @@ public class Tetris extends JFrame implements KeyListener{
 		setLayout(new BorderLayout());
 		addKeyListener(this);
 		startLbl = new JLabel("Press ENTER to start.");
+		startLbl.setFont(new Font("Tahoma", Font.BOLD, 25));
 		add(startLbl);
 		board = new Board();
 	}
