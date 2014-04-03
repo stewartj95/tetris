@@ -15,8 +15,6 @@ TO IMPLEMENT
 MUST
 ====
 1. Main Menu
-2. Scoring System
-3. Levels with increase in speed as levels progress
 
 COULD
 =====
