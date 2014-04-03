@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,18 +15,20 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Board extends JPanel implements ActionListener, KeyListener {
-	Timer timer = new Timer(10, this);
+	Timer timer = new Timer(5, this);
 	Grid grid = new Grid();
 	
 	Shape tetromino;
 
-	int w = 40, h = 36, x = 200, y = h, velY=2;
+	int w = 40, h = 36, x = 200;
+	double y = h, velY=0.3;
 	int row = 0, column = 0;
 	JLabel[] debugLabels = {new JLabel("Block 1 row:    column:    "),
 							new JLabel("Block 2 row:    column:    "),
 							new JLabel("Block 3 row:    column:    "),
 							new JLabel("Block 4 row:    column:    ")};
-	JLabel statusLabel;
+	JLabel gameOverLabel, levelLabel, scoreLabel;
+	private Score score;
 	
 	public Board() {
 		setFocusTraversalKeysEnabled(false); 
@@ -35,21 +38,37 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 //		for(JLabel label : debugLabels) {
 //			add(label);
 //		}
+		score = new Score();
 		tetromino = new Shape(w, h);
-		statusLabel = new JLabel();
-		statusLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
-		add(statusLabel, BorderLayout.CENTER);
+		gameOverLabel = new JLabel();
+		gameOverLabel.setFont(new Font("Tahoma", Font.BOLD, 20));
+		levelLabel = new JLabel("Level : " + score.getLevel());
+		levelLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
+		scoreLabel = new JLabel("Score: " + score.getScore());
+		scoreLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
+		
+		JPanel scorePanel = new JPanel();
+		scorePanel.setLayout(new GridLayout(1,3));
+		scorePanel.add(levelLabel);
+		scorePanel.add(new JLabel(""));
+		scorePanel.add(scoreLabel);
+		add(scorePanel, BorderLayout.NORTH);
+		add(gameOverLabel, BorderLayout.CENTER);
 	}
 
 	public void start() {
 		tetromino.randomShape();
-		statusLabel.setText("");
+		gameOverLabel.setText("");
 		timer.start();
-		velY = 2;
+		score = new Score();
+		velY = score.getLevelSpeed();
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+
+		levelLabel.setText("Level: " + score.getLevel());
+		scoreLabel.setText("Score: " + score.getScore());
 		
 		// Draw dropped pieces.
 		Cell[][] cells = grid.getCells();
@@ -89,7 +108,8 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 //			System.out.println(grid);
 		}
 		
-		// Draw bottom border
+		levelLabel.setText("Level: " + score.getLevel());
+		
 	}
 	
 	public boolean cellBesideIsEmpty(int DIRECTION) {
@@ -132,7 +152,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				tetromino.rotate(Shape.LEFT);
 				break;
 			case KeyEvent.VK_SPACE:
-				velY = 30;
+				velY = 10;
 				break;
 			case KeyEvent.VK_ESCAPE:
 				timer.stop();
@@ -140,7 +160,7 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 				start();
 				break;
 			case KeyEvent.VK_DOWN:
-				velY = 30;
+				velY = 10;
 				break;
 		}
 	}
@@ -151,20 +171,27 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 	}
 	
 	public boolean collision() {
+		boolean collision = false;
 		for(int block=0; block<4; block++) {
 			try {
 				int row = tetromino.getRow(block);
 				int column = tetromino.getColumn(block);
 				int nextCellState = grid.getCell(row+1, column).getState();
 				if(nextCellState == Cell.NOT_EMPTY) {
-					return true;
+					collision = true;
+					break;
 				}
 			} catch (IndexOutOfBoundsException exception) {
 				continue;
 			}
 		}
-		grid.updateRows();
-		return false;
+		int rowsCleared = grid.updateRows();
+		if(rowsCleared > 0) {
+			int points = 50 * rowsCleared; 
+			score.updateScore(points);
+			velY = score.getLevelSpeed();
+		}
+		return collision;
 	}
 
 	@Override
@@ -190,16 +217,16 @@ public class Board extends JPanel implements ActionListener, KeyListener {
 			}
 			tetromino.randomShape();
 			y = h;
-			velY = 2;
+			velY = score.getLevelSpeed();
 			x = 200;
 			if(grid.getCell(1, 5).getState() == Cell.NOT_EMPTY) {
 				// GAME OVER
 				timer.stop();
-				statusLabel.setText("GAME OVER! Press ESC to restart.");
+				gameOverLabel.setText("GAME OVER! Press ESC to restart.");
 			}
 		}
 		tetromino.setX(x);
-		tetromino.setY(y);
+		tetromino.setY((int)y);
 		repaint();
 	}
 }
