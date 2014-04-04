@@ -1,10 +1,19 @@
-package tetris;
+package model;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Shape {
-	enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, REVERSESSHAPE, LSHAPE, REVERSELSHAPE, LINE, SQUARE};
+import view.game.GameView;
+
+public class ShapeModel {
+	
+	// This class provides a way to create tetromino shapes, keep
+	// track of their current location, generate random tetrominoes,
+	// and get information about the tetromino such as their colour,
+	// their current coordinate
+	
+	public enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, 
+		REVERSESSHAPE, LSHAPE, REVERSELSHAPE, LINE, SQUARE};
 	public static final int RIGHT = 0, LEFT = 1;
 	int[][] coordinates;
 	int[][] blockCoordinates;
@@ -13,11 +22,10 @@ public class Shape {
 	private Color color;
 	private boolean rotated = false;
 	private HashMap<Tetrominoes, int[][][]> rotationCoords;
-	private int rotationIndex = 0;
+	private int coordinatesIndex = 0;
+	private GameView board;
 	
-	public Shape(int width, int height) {
-		this.width = width;
-		this.height = height;
+	public ShapeModel() {
 		Tetrominoes shape = Tetrominoes.NOSHAPE;
 		coordinates = new int[4][2];
 		currentShape = shape;
@@ -25,41 +33,92 @@ public class Shape {
 		blockCoordinates = new int[4][2];
 		loadRotationCoordinates();
 	}
-
+	
+	// Returns the row for the whole shape, which is the row of 
+	// the bottom-most block.
+	public int getRow() {
+		int row = 0;
+		for (int i = 0; i < blockCoordinates.length; i++) {
+			row = Math.max(row, getBlockRow(i));
+		}
+		return row;
+	}
+	
+	// Returns the leftmost or rightmost column. E.g. if direction is RIGHT
+	// then the max column value is returned.
+	public int getColumn(int DIRECTION) {
+		int column = getBlockColumn(0);
+		for (int i = 0; i < 4; i++) {
+			if(DIRECTION == RIGHT) 
+				column = Math.max(column, getBlockColumn(i));
+			else if(DIRECTION == LEFT)
+				column = Math.min(column, getBlockColumn(i));
+		}
+		return column;
+	}
+	
 	public void rotate(int DIRECTION) {
-		int oldRotationIndex = rotationIndex;
-		if(DIRECTION == Shape.RIGHT) {
-			rotationIndex++;
-		} else if (DIRECTION == Shape.LEFT) {
-			rotationIndex--;
+		int last = rotationCoords.get(currentShape).length - 1;
+
+		if(DIRECTION == ShapeModel.RIGHT ) {
+			if(coordinatesIndex < last)
+				coordinatesIndex++;
+			else
+				coordinatesIndex = 0;
+		} else if (DIRECTION == ShapeModel.LEFT ) {
+			if(coordinatesIndex > 0)
+				coordinatesIndex--;
+			else
+				coordinatesIndex = last;
 		}
 		
-		int[][] newCoordinates = new int[4][2];
+		int[][] rotationCoordinates = new int[4][2];
+		rotationCoordinates = rotationCoords.get(currentShape)[coordinatesIndex];
 		
-		try {
-			newCoordinates = rotationCoords.get(currentShape)[rotationIndex];
-		} catch (IndexOutOfBoundsException exception) {
-			if(DIRECTION == Shape.LEFT) {
-				rotationIndex = rotationCoords.get(currentShape).length-1;
-			} else if (DIRECTION == Shape.RIGHT) {
-				rotationIndex = 0;
+		if(isLegalRotation(rotationCoordinates)) { 
+			coordinates = rotationCoordinates;
+			int originColumn = findOriginColumn();
+			int originRow = findOriginRow();
+			for (int block = 0; block < 4; block++) {
+				column = originColumn + coordinates[block][0];
+				row = originRow + coordinates[block][1];
+				setColumn(block, column);
+				setRow(block, row);
 			}
-			newCoordinates = rotationCoords.get(currentShape)[rotationIndex];
 		}
-		
-		// Check if this would be a legal rotation, i.e. it would not make 
-		// any blocks leave the grid.
-		for (int i = 0; i < newCoordinates.length; i++) {
-			int column = calculateXPosition(newCoordinates[i][0]) / width;
+	}
+	
+	// Returns the index of the origin column, i.e. the block in the middle of the shape.
+	private int findOriginColumn() {
+		for (int i = 0; i < 4; i++) {
+			if(coordinates[i][0] == 0 && coordinates[i][1] == 0) {
+				return getBlockColumn(i) + coordinates[i][0];
+			}
+		}
+		return -1;
+	}
+	
+	// Returns the index of the origin row, i.e. the block in the middle of the shape.
+	private int findOriginRow() {
+		for (int i = 0; i < 4; i++) {
+			if(coordinates[i][0] == 0 && coordinates[i][1] == 0) {
+				return getBlockRow(i) + coordinates[i][1];
+			}
+		}
+		return -1;
+	}
+	
+	private boolean isLegalRotation(int[][] coordinates) {
+		boolean isLegal = true;
+		for (int i = 0; i < 4; i++) {
+			column = getBlockColumn(i) + coordinates[i][0];
+			row = getBlockRow(i) + coordinates[i][1];
 			if(column < 0 || column > 9) {
 				// This would be an illegal rotation, so do not allow it.
-				rotationIndex = oldRotationIndex;
-				return;
+				isLegal = false;
 			}
 		}
-		
-		coordinates = newCoordinates;
-		
+		return isLegal;
 	}
 
 	private void loadRotationCoordinates() {
@@ -110,25 +169,31 @@ public class Shape {
 		int[][][] SQUARESHAPEcoords = {
 				{ {0,-1}, {0,0}, {1,0}, {1,-1} }   // DEFAULT 
 		};
+		rotationCoords.put(Tetrominoes.SQUARE, SQUARESHAPEcoords);
 		
 	}
 	
 	public void newShape(Tetrominoes shape) {
 		coordinates = rotationCoords.get(shape)[0];
 		currentShape = shape;
+		for (int block = 0; block < 4; block++) {
+			column = 5 + coordinates[block][0];
+			row = 2 + coordinates[block][1];
+			setColumn(block, column);
+			setRow(block, row);
+		}
+	}
+
+	public Tetrominoes getShape() {
+		return currentShape;
 	}
 	
 	public int[][] getRotationCoordinates(Tetrominoes shape, int DIRECTION) {
 		return null;
 	}
-
 	
 	public void setColor(Color color) {
 		this.color = color;
-	}
-	
-	public Tetrominoes getShape() {
-		return currentShape;
 	}
 	
 	public Color getColor() {
@@ -166,6 +231,7 @@ public class Shape {
 		}
 		return shapeX;
 	}
+	
 
 	private int calculateYPosition(int c) {
 		int shapeY = 0;
@@ -180,7 +246,6 @@ public class Shape {
 		}
 		return shapeY;
 	}
-	
 		
 	public void setRow(int block, int row) {
 		blockCoordinates[block][0] = row;
@@ -190,11 +255,11 @@ public class Shape {
 		blockCoordinates[block][1] = column;
 	}
 	
-	public int getRow(int block) {
+	public int getBlockRow(int block) {
 		return blockCoordinates[block][0];
 	}
 	
-	public int getColumn(int block) {
+	public int getBlockColumn(int block) {
 		return blockCoordinates[block][1];
 	}
 	
@@ -275,7 +340,7 @@ public class Shape {
 				break;
 		}
 		rotated = false;
-		rotationIndex = 0;
+		coordinatesIndex = 0;
 		newShape(Tetrominoes.values()[index]);
 	}
 		

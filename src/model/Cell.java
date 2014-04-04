@@ -1,4 +1,4 @@
-package tetris;
+package model;
 
 import java.awt.Color;
 
@@ -6,6 +6,7 @@ public class Cell {
 	
 	public static final int EMPTY = 0;
 	public static final int NOT_EMPTY = 1;
+	public static final int TETROMINO = 2;
 	private Color color;
 	private int state;
 	
