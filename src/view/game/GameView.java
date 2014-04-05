@@ -97,6 +97,7 @@ public class GameView extends JPanel {
 					}
 				}
 			}
+			g.setColor(Color.RED);
 		} catch (NullPointerException ex) {
 			// Ignore
 		}

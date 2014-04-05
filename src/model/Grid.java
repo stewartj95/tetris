@@ -72,10 +72,10 @@ public class Grid {
 	public void rotate(int direction) {
 		if(direction == ShapeModel.RIGHT) {
 			emptyCells();
-			shapeModel.rotate(shapeModel.RIGHT);
+			shapeModel.rotate(shapeModel.RIGHT, cells);
 		} else if (direction == ShapeModel.LEFT) {
 			emptyCells();
-			shapeModel.rotate(shapeModel.LEFT);
+			shapeModel.rotate(shapeModel.LEFT, cells);
 		}
 		update();
 	}
@@ -133,24 +133,32 @@ public class Grid {
 	
 	private void updateTetrominoPosition() {
 		for (int block = 0; block < 4; block++) {
-			row = shapeModel.getBlockRow(block);
-			column = shapeModel.getBlockColumn(block);
-
-			Cell cell = getCell(row-1, column);
-			if(cell.getState() != Cell.NOT_EMPTY) {
-				cell.setState(Cell.EMPTY);
-				cell.setColor(null);
+			try {
+				row = shapeModel.getBlockRow(block);
+				column = shapeModel.getBlockColumn(block);
+	
+				Cell cell = getCell(row-1, column);
+				if(cell.getState() != Cell.NOT_EMPTY) {
+					cell.setState(Cell.EMPTY);
+					cell.setColor(null);
+				}
+			} catch(ArrayIndexOutOfBoundsException ex) {
+				continue;
 			}
 		}
 		
 		for (int block = 0; block < 4; block++) {
-			row = shapeModel.getBlockRow(block);
-			column = shapeModel.getBlockColumn(block);
-			
-			Cell cell = getCell(row, column);
-			cell = getCell(row, column);
-			cell.setState(Cell.TETROMINO);
-			cell.setColor(shapeModel.getColor());
+			try {
+				row = shapeModel.getBlockRow(block);
+				column = shapeModel.getBlockColumn(block);
+				
+				Cell cell = getCell(row, column);
+				cell = getCell(row, column);
+				cell.setState(Cell.TETROMINO);
+				cell.setColor(shapeModel.getColor());
+			} catch (ArrayIndexOutOfBoundsException ex) {
+				continue;
+			}
 		}
 	}
 	

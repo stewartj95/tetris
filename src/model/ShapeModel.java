@@ -57,9 +57,9 @@ public class ShapeModel {
 		return column;
 	}
 	
-	public void rotate(int DIRECTION) {
+	public void rotate(int DIRECTION, Cell[][] cells) {
+		int indexBackup = coordinatesIndex;
 		int last = rotationCoords.get(currentShape).length - 1;
-
 		if(DIRECTION == ShapeModel.RIGHT ) {
 			if(coordinatesIndex < last)
 				coordinatesIndex++;
@@ -75,7 +75,7 @@ public class ShapeModel {
 		int[][] rotationCoordinates = new int[4][2];
 		rotationCoordinates = rotationCoords.get(currentShape)[coordinatesIndex];
 		
-		if(isLegalRotation(rotationCoordinates)) { 
+		if(isLegalRotation(rotationCoordinates, cells)) { 
 			coordinates = rotationCoordinates;
 			int originColumn = findOriginColumn();
 			int originRow = findOriginRow();
@@ -85,6 +85,8 @@ public class ShapeModel {
 				setColumn(block, column);
 				setRow(block, row);
 			}
+		} else {
+			coordinatesIndex = indexBackup;
 		}
 	}
 	
@@ -108,13 +110,24 @@ public class ShapeModel {
 		return -1;
 	}
 	
-	private boolean isLegalRotation(int[][] coordinates) {
+	// @param cells  A grid of cells in the tetris board. Used to check for legal rotation
+	//               i.e. the rotation won't cause this tetromino to go into other tetrominoes. 
+	// @param coordinates  the rotation coordinates, used to check the new location the 
+	//                     tetromino will go to is legal
+	private boolean isLegalRotation(int[][] coordinates, Cell[][] cells) {
 		boolean isLegal = true;
+		Cell cell = null;
 		for (int i = 0; i < 4; i++) {
-			column = getBlockColumn(i) + coordinates[i][0];
-			row = getBlockRow(i) + coordinates[i][1];
-			if(column < 0 || column > 9) {
-				// This would be an illegal rotation, so do not allow it.
+			try {
+				column = getBlockColumn(i) + coordinates[i][0];
+				row = getBlockRow(i) + coordinates[i][1];
+				cell = cells[row][column];
+				if(column < 0 || column > 9 || cell.getState() == Cell.NOT_EMPTY) {
+					// This would be an illegal rotation, so do not allow it.
+					isLegal = false;
+				}
+			} catch (ArrayIndexOutOfBoundsException ex) {
+				// Tried to get invalid cell index, e.g. -1, which is not a legal rotation.
 				isLegal = false;
 			}
 		}
@@ -200,53 +213,6 @@ public class ShapeModel {
 		return color;
 	}
 	
-	public int getWidth() {
-		return width;
-	}
-	
-	public int getHeight() {
-		return height;
-	}
-	
-	// Returns the X coordinate for one block in this tetromino
-	public int blockX(int block) {
-		return calculateXPosition(coordinates[block][0]); 
-	}
-	
-	// Returns the Y coordinate for one block in this tetromino
-	public int blockY(int block) {
-		return calculateYPosition(coordinates[block][1]); 
-	}
-
-	private int calculateXPosition(int c) {
-		int shapeX = 0;
-		if (c < 0) {
-			shapeX = x - width;
-		} else if (c == 0) {
-			shapeX = x;
-		} else if (c == 1) {
-			shapeX = x + width;
-		} else if (c == 2) {
-			shapeX = x + (2 * width);
-		}
-		return shapeX;
-	}
-	
-
-	private int calculateYPosition(int c) {
-		int shapeY = 0;
-		if (c < 0) {
-			shapeY = y - height;
-		} else if (c == 0) {
-			shapeY = y;
-		} else if (c == 1) {
-			shapeY = y + height;
-		} else if (c == 2) {
-			shapeY = y + (2 * height);
-		}
-		return shapeY;
-	}
-		
 	public void setRow(int block, int row) {
 		blockCoordinates[block][0] = row;
 	}
@@ -263,65 +229,9 @@ public class ShapeModel {
 		return blockCoordinates[block][1];
 	}
 	
-	public void setX(int x) {
-		this.x = x;
-	}
-	
-	public int getX() {
-		return this.x;
-	}
-	
-	public void setY(int y) {
-		this.y = y;
-	}
-	
-	public int getY() {
-		return this.y;
-	}
-	
-	public void setShapeCoordinates(int[][] coordinates) {
-		this.coordinates = coordinates;
-	}
-	
-	public int[][] getShapeCoordinates() {
-		return coordinates;
-	}
-	
-	public int maxX() {
-		int max = 0;
-		for(int i=0; i<4; i++) {
-			max = Math.max(max, coordinates[i][0]);
-		}
-		return max + 2;
-	}
-	
-	public int maxY() {
-		int max = 0;
-		for(int i=0; i<4; i++) {
-			max = Math.max(max, coordinates[i][1]);
-		}
-		return max;
-	}
-	
-	public int minX() {
-		int min = 0;
-		for(int i=0; i<4; i++) {
-			min = Math.min(min, coordinates[i][0]);
-		}
-		return min;
-	}
-
-	public int minY() {
-		int min = 0;
-		for(int i=0; i<4; i++) {
-			min = Math.min(min, coordinates[i][1]);
-		}
-		return min;
-	}
-	
 	public void randomShape() {
 		Random r = new Random();
-		int index = r.nextInt(Tetrominoes.values().length-2)+1;
+		int index = r.nextInt(Tetrominoes.values().length-1)+1;
 		switch (r.nextInt(3)) {
 			case 0:
 				setColor(Color.RED);

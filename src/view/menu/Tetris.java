@@ -17,7 +17,7 @@ public class Tetris extends JFrame implements KeyListener {
 	
 	private GameController gameController;
 	private JLabel startLbl;
-	private JPanel menu;
+	private MainMenu menu;
 	
 	public Tetris() {
 		gameController = new GameController(this);
@@ -30,16 +30,17 @@ public class Tetris extends JFrame implements KeyListener {
 		add(startLbl);
 
 		setTitle("Tetris");
-		setSize(407, 786);
+		setSize(300, 500);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setLayout(new BorderLayout());
 		addKeyListener(this);
 		requestFocus();
-
+		
+		menu = new MainMenu();
 		GameView gameView = gameController.getGameView();
-		gameView.setSize(400, 660);
+		gameView.setSize(280, 480);
 		add(gameView);
 	}
 
@@ -53,7 +54,7 @@ public class Tetris extends JFrame implements KeyListener {
 	public void keyTyped(KeyEvent arg0) {}
 	
 	public static void main(String[] args) {
-		Tetris tetris = new Tetris();
+		new Tetris();
 	}
 	
 }

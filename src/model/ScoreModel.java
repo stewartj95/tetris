@@ -70,7 +70,6 @@ public class ScoreModel {
 	}
 	
 	class Level {
-		
 		private int requiredScore;
 		private int speed;
 		

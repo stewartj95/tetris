@@ -18,7 +18,7 @@ public class GameController implements ActionListener, KeyListener {
 	
 	private enum GameStates {STARTED, STOPPED};
 	private GameView gameView; 
-	private Timer timer = new Timer(10, this);
+	private Timer timer = new Timer(1, this);
 	private Grid grid;
 	private ScoreModel scoreModel;
 	private ShapeModel shapeModel;
@@ -30,6 +30,7 @@ public class GameController implements ActionListener, KeyListener {
 		gameView = new GameView(parent, grid);
 		gameView.addKeyListener(this);
 		gameView.requestFocusInWindow();
+		gameView.requestFocus();
 	}
 	
 	public GameView getGameView() {
@@ -84,12 +85,10 @@ public class GameController implements ActionListener, KeyListener {
 		}
 	}
 
-	public void keyReleased(KeyEvent event) {
-	}
+	public void keyReleased(KeyEvent event) {}
 	
 	
-	public void keyTyped(KeyEvent event) {
-	}
+	public void keyTyped(KeyEvent event) {}
 	
 	// Game loop
 	// Update grid. If required time elapsed (represents game speed, elapsed == delay)
@@ -107,7 +106,6 @@ public class GameController implements ActionListener, KeyListener {
 			gameView.repaint();
 			elapsed += 10;
 		}
-		System.out.println(grid);
 	}
 
 }
