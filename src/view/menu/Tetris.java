@@ -1,6 +1,7 @@
 package view.menu;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
@@ -12,6 +13,7 @@ import javax.swing.JPanel;
 
 import controller.GameController;
 import view.game.GameView;
+import view.game.NextShapeView;
 
 public class Tetris extends JFrame implements KeyListener {
 	
@@ -25,28 +27,31 @@ public class Tetris extends JFrame implements KeyListener {
 	}
 	
 	private void initGUI() {
-		startLbl = new JLabel("Press ENTER to start.");
-		startLbl.setFont(new Font("Tahoma", Font.BOLD, 25));
-		add(startLbl);
-
 		setTitle("Tetris");
-		setSize(407, 822);
+		setSize(220, 500);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
-		setLayout(new BorderLayout());
 		addKeyListener(this);
 		requestFocus();
+		BorderLayout layout = new BorderLayout();
+		setLayout(layout);
 		
-		menu = new MainMenu();
+		menu = new MainMenu();	
 		GameView gameView = gameController.getGameView();
-		gameView.setSize(400, 800);
-		add(gameView);
+		gameView.setSize(200, 400);
+		NextShapeView nextShapeView = gameController.getNextShapeView();
+		nextShapeView.setWidth(100);
+		nextShapeView.setHeight(60);
+		nextShapeView.setPreferredSize(new Dimension(100,60));
+		add(nextShapeView, BorderLayout.NORTH);
+		add(gameView, BorderLayout.CENTER);
 	}
 
 	public void keyPressed(KeyEvent event) {
 		if(event.getKeyCode() == KeyEvent.VK_ENTER) {
 			startLbl.setText("");
+			remove(startLbl);
 			gameController.startGame();
 		}
 	}

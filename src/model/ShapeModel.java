@@ -19,11 +19,11 @@ public class ShapeModel {
 
 	public static final int RIGHT = 0, LEFT = 1;
 
-	private int row, column;
+	private int row, column, maxColumns = 10;
 	private Color color;
 	private HashMap<Tetrominoes, int[][][]> rotationCoords;
 
-	private int coordinatesIndex = 0;
+	private int coordinatesIndex = 0, nextShapeIndex = 0;
 	int[][] coordinates;
 	int[][] blockCoordinates;
 	
@@ -37,6 +37,14 @@ public class ShapeModel {
 		color = Color.RED;
 		blockCoordinates = new int[4][2];
 		loadRotationCoordinates();
+	}
+	
+	public void setMaxColumns(int maxColumns) {
+		this.maxColumns = maxColumns;
+	}
+	
+	public int getMaxColumns() {
+		return maxColumns;
 	}
 	
 	public Type getType() {
@@ -203,8 +211,8 @@ public class ShapeModel {
 		coordinates = rotationCoords.get(shape)[0];
 		currentShape = shape;
 		for (int block = 0; block < 4; block++) {
-			column = 5 + coordinates[block][0];
-			row = 1 + coordinates[block][1];
+			column = maxColumns/2 + coordinates[block][0];
+			row = 2 + coordinates[block][1];
 			setColumn(block, column);
 			setRow(block, row);
 		}
@@ -223,29 +231,7 @@ public class ShapeModel {
 	}
 	
 	public Color getColor() {
-		return color;
-	}
-	
-	public void setRow(int block, int row) {
-		blockCoordinates[block][0] = row;
-	}
-	
-	public void setColumn(int block, int column) {
-		blockCoordinates[block][1] = column;
-	}
-	
-	public int getBlockRow(int block) {
-		return blockCoordinates[block][0];
-	}
-	
-	public int getBlockColumn(int block) {
-		return blockCoordinates[block][1];
-	}
-	
-	public void randomShape() {
-		Random r = new Random();
-		int index = r.nextInt(Tetrominoes.values().length-1)+1;
-		switch (index) {
+		switch (currentShape.ordinal()) {
 			case 1:
 				setColor(Color.RED);
 				break;
@@ -270,8 +256,39 @@ public class ShapeModel {
 			default:
 				break;
 		}
+		return color;
+	}
+	
+	public void setRow(int block, int row) {
+		blockCoordinates[block][0] = row;
+	}
+	
+	public void setColumn(int block, int column) {
+		blockCoordinates[block][1] = column;
+	}
+	
+	public int getBlockRow(int block) {
+		return blockCoordinates[block][0];
+	}
+	
+	public int getBlockColumn(int block) {
+		return blockCoordinates[block][1];
+	}
+	
+	public void randomShape() {
+		Random r = new Random();
+		if(nextShapeIndex == 0) {
+			// First shape generation
+			nextShapeIndex = r.nextInt(Tetrominoes.values().length-1)+1;
+		}
+		
 		coordinatesIndex = 0;
-		newShape(Tetrominoes.values()[index]);
+		newShape(Tetrominoes.values()[nextShapeIndex]);
+		nextShapeIndex  = r.nextInt(Tetrominoes.values().length-1)+1;
+	}
+	
+	public int getNextShapeIndex() {
+		return nextShapeIndex;
 	}
 		
 }

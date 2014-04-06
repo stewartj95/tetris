@@ -8,25 +8,29 @@ import java.awt.event.KeyListener;
 import javax.swing.Timer;
 
 import view.game.GameView;
+import view.game.NextShapeView;
 import view.menu.Tetris;
 import model.Cell;
 import model.Grid;
 import model.ScoreModel;
 import model.ShapeModel;
+import model.ShapeModel.Tetrominoes;
 
 public class GameController implements ActionListener, KeyListener {
 	
-	private enum GameStates {STARTED, STOPPED};
+	public enum GameStates {STARTED, STOPPED};
 	private GameView gameView; 
 	private Timer timer = new Timer(1, this);
 	private Grid grid;
-	private ScoreModel scoreModel;
+	private ScoreModel score;
 	private ShapeModel shapeModel;
-	private GameStates gameState = GameStates.STOPPED;
-	private int row = 2, elapsed = 0, speed = 500;
+	private NextShapeView nextShapeView;
+	public GameStates gameState = GameStates.STOPPED;
+	private int elapsed = 0;
+	private Tetrominoes nextShape = Tetrominoes.NOSHAPE;
 	
 	public GameController(Tetris parent) {
-		grid = new Grid(scoreModel);
+		nextShapeView = new NextShapeView();
 		gameView = new GameView(parent, grid);
 		gameView.addKeyListener(this);
 		gameView.requestFocusInWindow();
@@ -37,11 +41,17 @@ public class GameController implements ActionListener, KeyListener {
 		return gameView;
 	}
 	
+	public NextShapeView getNextShapeView() {
+		return nextShapeView;
+	}
+	
 	public void startGame() {
-		scoreModel = new ScoreModel();
-		grid = new Grid(scoreModel);
+		score = new ScoreModel(1);
+		grid = new Grid(score, this);
+
 		gameView.setGrid(grid);
 		shapeModel = grid.getShapeModel();
+
 		shapeModel.randomShape();
 		timer.start();
 		gameState = GameStates.STARTED;
@@ -86,8 +96,6 @@ public class GameController implements ActionListener, KeyListener {
 	}
 
 	public void keyReleased(KeyEvent event) {}
-	
-	
 	public void keyTyped(KeyEvent event) {}
 	
 	// Game loop
@@ -97,15 +105,18 @@ public class GameController implements ActionListener, KeyListener {
 	public void actionPerformed(ActionEvent e) {
 		if(gameState == GameStates.STARTED) {
 			grid.update();
-			row = grid.getShapeModel().getRow();
-			if (elapsed == speed) {
+			if (elapsed >= score.getLevelSpeed()) {
 				grid.nextLine(grid.getShapeModel());
 				elapsed = 0;
 			}
-			speed = scoreModel.getLevelSpeed();
 			gameView.repaint();
-			elapsed += 10;
+			elapsed += 1;
+			gameView.updateScore(score.getPoints());
+			gameView.updateLevel(score.getLevel());
+			nextShape = Tetrominoes.values()[shapeModel.getNextShapeIndex()];
+			nextShapeView.setNextShape(nextShape);
 		}
+		System.out.println(grid);
 	}
 
 }
