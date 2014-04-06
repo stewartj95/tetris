@@ -12,26 +12,35 @@ public class ShapeModel {
 	// and get information about the tetromino such as their colour,
 	// their current coordinate
 	
+	public enum Type {CURRENT_SHAPE, SHADOW};
 	public enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, 
 		REVERSESSHAPE, LSHAPE, REVERSELSHAPE, LINE, SQUARE};
+	Tetrominoes currentShape;
+
 	public static final int RIGHT = 0, LEFT = 1;
+
+	private int row, column;
+	private Color color;
+	private HashMap<Tetrominoes, int[][][]> rotationCoords;
+
+	private int coordinatesIndex = 0;
 	int[][] coordinates;
 	int[][] blockCoordinates;
-	Tetrominoes currentShape;
-	private int x, y, row, column, width, height;
-	private Color color;
-	private boolean rotated = false;
-	private HashMap<Tetrominoes, int[][][]> rotationCoords;
-	private int coordinatesIndex = 0;
-	private GameView board;
 	
-	public ShapeModel() {
+	private Type type;
+	
+	public ShapeModel(Type type) {
+		this.type = type;
 		Tetrominoes shape = Tetrominoes.NOSHAPE;
 		coordinates = new int[4][2];
 		currentShape = shape;
 		color = Color.RED;
 		blockCoordinates = new int[4][2];
 		loadRotationCoordinates();
+	}
+	
+	public Type getType() {
+		return type;
 	}
 	
 	// Returns the row for the whole shape, which is the row of 
@@ -42,6 +51,10 @@ public class ShapeModel {
 			row = Math.max(row, getBlockRow(i));
 		}
 		return row;
+	}
+	
+	public int[][] getCoordinates() {
+		return coordinates;
 	}
 	
 	// Returns the leftmost or rightmost column. E.g. if direction is RIGHT
@@ -91,7 +104,7 @@ public class ShapeModel {
 	}
 	
 	// Returns the index of the origin column, i.e. the block in the middle of the shape.
-	private int findOriginColumn() {
+	public int findOriginColumn() {
 		for (int i = 0; i < 4; i++) {
 			if(coordinates[i][0] == 0 && coordinates[i][1] == 0) {
 				return getBlockColumn(i) + coordinates[i][0];
@@ -101,7 +114,7 @@ public class ShapeModel {
 	}
 	
 	// Returns the index of the origin row, i.e. the block in the middle of the shape.
-	private int findOriginRow() {
+	public int findOriginRow() {
 		for (int i = 0; i < 4; i++) {
 			if(coordinates[i][0] == 0 && coordinates[i][1] == 0) {
 				return getBlockRow(i) + coordinates[i][1];
@@ -191,7 +204,7 @@ public class ShapeModel {
 		currentShape = shape;
 		for (int block = 0; block < 4; block++) {
 			column = 5 + coordinates[block][0];
-			row = 2 + coordinates[block][1];
+			row = 1 + coordinates[block][1];
 			setColumn(block, column);
 			setRow(block, row);
 		}
@@ -232,24 +245,31 @@ public class ShapeModel {
 	public void randomShape() {
 		Random r = new Random();
 		int index = r.nextInt(Tetrominoes.values().length-1)+1;
-		switch (r.nextInt(3)) {
-			case 0:
-				setColor(Color.RED);
-				break;
+		switch (index) {
 			case 1:
-				setColor(Color.CYAN);
+				setColor(Color.RED);
 				break;
 			case 2:
-				setColor(Color.YELLOW);
+				setColor(Color.CYAN);
 				break;
 			case 3:
+				setColor(Color.YELLOW);
+				break;
+			case 4:
 				setColor(Color.GREEN);
 				break;
+			case 5:
+				setColor(Color.ORANGE);
+				break;
+			case 6:
+				setColor(Color.PINK);
+				break;
+			case 7:
+				setColor(Color.MAGENTA);
+				break;
 			default:
-				setColor(Color.RED);
 				break;
 		}
-		rotated = false;
 		coordinatesIndex = 0;
 		newShape(Tetrominoes.values()[index]);
 	}

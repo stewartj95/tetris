@@ -7,6 +7,7 @@ public class Cell {
 	public static final int EMPTY = 0;
 	public static final int NOT_EMPTY = 1;
 	public static final int TETROMINO = 2;
+	public static final int SHADOW = 3;
 	private Color color;
 	private int state;
 	
@@ -27,6 +28,8 @@ public class Cell {
 	
 	public void setState(int state) {
 		this.state = state;
+		if(state == Cell.SHADOW)
+			color = Color.LIGHT_GRAY;
 	}
 	
 	public int getState() {

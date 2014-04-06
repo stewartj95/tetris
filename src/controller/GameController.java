@@ -23,7 +23,7 @@ public class GameController implements ActionListener, KeyListener {
 	private ScoreModel scoreModel;
 	private ShapeModel shapeModel;
 	private GameStates gameState = GameStates.STOPPED;
-	private int row = 2, normalSpeed = 500, elapsed = 0, downSpeed = 30, speed = normalSpeed;
+	private int row = 2, elapsed = 0, speed = 500;
 	
 	public GameController(Tetris parent) {
 		grid = new Grid(scoreModel);
@@ -70,10 +70,10 @@ public class GameController implements ActionListener, KeyListener {
 				grid.rotate(ShapeModel.LEFT);
 				break;
 			case KeyEvent.VK_SPACE:
-				grid.hardDrop();
+				grid.hardDrop(grid.getShapeModel());
 				break;
 			case KeyEvent.VK_DOWN:
-				grid.nextLine();
+				grid.nextLine(grid.getShapeModel());
 				break;
 			case KeyEvent.VK_ESCAPE:
 				stopGame();
@@ -99,7 +99,7 @@ public class GameController implements ActionListener, KeyListener {
 			grid.update();
 			row = grid.getShapeModel().getRow();
 			if (elapsed == speed) {
-				grid.nextLine();
+				grid.nextLine(grid.getShapeModel());
 				elapsed = 0;
 			}
 			speed = scoreModel.getLevelSpeed();
