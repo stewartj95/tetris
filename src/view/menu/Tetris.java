@@ -30,7 +30,7 @@ public class Tetris extends JFrame implements KeyListener {
 		add(startLbl);
 
 		setTitle("Tetris");
-		setSize(300, 500);
+		setSize(407, 822);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
@@ -40,7 +40,7 @@ public class Tetris extends JFrame implements KeyListener {
 		
 		menu = new MainMenu();
 		GameView gameView = gameController.getGameView();
-		gameView.setSize(280, 480);
+		gameView.setSize(400, 800);
 		add(gameView);
 	}
 
