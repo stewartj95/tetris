@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 
 import javax.swing.JLabel;
@@ -46,6 +47,7 @@ public class GameView extends JPanel {
 
 		add(scorePanel, BorderLayout.NORTH);
 		add(gameOverLabel, BorderLayout.CENTER);
+		setDoubleBuffered(true);
 	}
 	
 	public void setSize(int width, int height) {
@@ -84,12 +86,9 @@ public class GameView extends JPanel {
 						int y = row * shapeHeight;
 						g.setColor(cell.getColor());
 						g.fillRect(x, y, shapeWidth, shapeHeight);
-						g.setColor(Color.BLACK);
-						g.drawRect(x, y, shapeWidth, shapeHeight);
 					}
 				}
 			}
-			g.setColor(Color.RED);
 		} catch (NullPointerException ex) {
 			// Ignore
 		}

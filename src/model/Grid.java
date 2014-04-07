@@ -52,7 +52,6 @@ public class Grid {
 		if(direction == ShapeModel.LEFT) {
 			validColumn = column > 0;
 		}
-		System.out.println("Cell beside empty: " + cellBesideIsEmpty(direction));
 		if (validColumn && cellBesideIsEmpty(direction)) {
 			column = 0;
 			for (int block = 0; block < 4; block++) {
@@ -229,30 +228,28 @@ public class Grid {
 	 *to EMPTY and sets the cells on the next row to Cell.TETROMINIO
 	 */
 	private void updateTetrominoPosition() {
-		for (int block = 0; block < 4; block++) {
-			try {
-				row = shape.getBlockRow(block);
-				column = shape.getBlockColumn(block);
-	
-				Cell cell = getCell(row-1, column);
-				if(cell.getState() != Cell.NOT_EMPTY) {
+		Cell cell = null;
+		
+		// Clear old position
+		for(int row=0; row<22; row++) {
+			for(int column=0; column<10; column++) {
+				cell = getCell(row, column);
+				if(cell.getState() == cell.TETROMINO) {
 					cell.setState(Cell.EMPTY);
 				}
-			} catch(ArrayIndexOutOfBoundsException ex) {
-				continue;
+				
 			}
 		}
 		
+		// Draw shape
 		for (int block = 0; block < 4; block++) {
 			try {
 				row = shape.getBlockRow(block);
 				column = shape.getBlockColumn(block);
-				
-				Cell cell = getCell(row, column);
 				cell = getCell(row, column);
 				cell.setState(Cell.TETROMINO);
 				cell.setColor(shape.getColor());
-			} catch (ArrayIndexOutOfBoundsException ex) {
+			} catch(ArrayIndexOutOfBoundsException ex) {
 				continue;
 			}
 		}
@@ -287,7 +284,6 @@ public class Grid {
 		}
 	}
 
-	//    and shifts the contents of every other row down one.
 	/**
 	* Checks for full rows, clears any and updates tetromino and its shadow position.
 	 */
@@ -359,8 +355,6 @@ public class Grid {
 		for (int block = 0; block < 4; block++) {
 			row = shape.getBlockRow(block);
 			cell = getCell(row, shape.getBlockColumn(block));
-			cell.setState(Cell.EMPTY);
-			cell.setColor(null);
 			shape.setRow(block, row+1);
 		}
 		

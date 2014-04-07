@@ -90,7 +90,6 @@ public class NextShapeView extends JPanel {
 					g.setColor(grid[row][column].getColor());
 					g.fillRect(x, y, shapeWidth, shapeHeight);
 					g.setColor(Color.BLACK);
-					g.drawRect(x, y, shapeWidth, shapeHeight);
 				}
 			}
 		}

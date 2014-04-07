@@ -46,7 +46,7 @@ public class GameController implements ActionListener, KeyListener {
 	}
 	
 	public void startGame() {
-		score = new ScoreModel(1);
+		score = new ScoreModel(10);
 		grid = new Grid(score, this);
 
 		gameView.setGrid(grid);
@@ -109,14 +109,13 @@ public class GameController implements ActionListener, KeyListener {
 				grid.nextLine(grid.getShapeModel());
 				elapsed = 0;
 			}
-			gameView.repaint();
-			elapsed += 1;
+			elapsed += 10;
 			gameView.updateScore(score.getPoints());
 			gameView.updateLevel(score.getLevel());
 			nextShape = Tetrominoes.values()[shapeModel.getNextShapeIndex()];
 			nextShapeView.setNextShape(nextShape);
+			gameView.repaint();
 		}
-		System.out.println(grid);
 	}
 
 }

@@ -15,10 +15,10 @@ TO IMPLEMENT
 MUST
 ====
 1. Main Menu
-2. Sound effects
 
 COULD
 =====
-1. Hold tetromino
-2. Choose a level in the main menu
-3. Save highscores and view leaderboard
+1. Sound effects
+2. Hold tetromino
+4. Choose a level in the main menu
+5. Save highscores and view leaderboard

@@ -28,7 +28,7 @@ public class Tetris extends JFrame implements KeyListener {
 	
 	private void initGUI() {
 		setTitle("Tetris");
-		setSize(220, 500);
+		setSize(220, 580);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
@@ -39,13 +39,14 @@ public class Tetris extends JFrame implements KeyListener {
 		
 		menu = new MainMenu();	
 		GameView gameView = gameController.getGameView();
-		gameView.setSize(200, 400);
+		gameView.setSize(210, 500);
 		NextShapeView nextShapeView = gameController.getNextShapeView();
-		nextShapeView.setWidth(100);
+		nextShapeView.setWidth(60);
 		nextShapeView.setHeight(60);
-		nextShapeView.setPreferredSize(new Dimension(100,60));
+		nextShapeView.setPreferredSize(new Dimension(60,60));
 		add(nextShapeView, BorderLayout.NORTH);
 		add(gameView, BorderLayout.CENTER);
+		createBufferStrategy(2);
 	}
 
 	public void keyPressed(KeyEvent event) {
