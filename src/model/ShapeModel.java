@@ -15,12 +15,12 @@ public class ShapeModel {
 	public enum Type {CURRENT_SHAPE, SHADOW};
 	public enum Tetrominoes {NOSHAPE, TSHAPE, SSHAPE, 
 		REVERSESSHAPE, LSHAPE, REVERSELSHAPE, LINE, SQUARE};
-	Tetrominoes currentShape;
+	Tetrominoes currentShape, heldShape;
 
 	public static final int RIGHT = 0, LEFT = 1;
 
 	private int row, column, maxColumns = 10;
-	private Color color;
+	private Color fillColor, outlineColor;
 	private HashMap<Tetrominoes, int[][][]> rotationCoords;
 
 	private int coordinatesIndex = 0, nextShapeIndex = 0;
@@ -34,9 +34,18 @@ public class ShapeModel {
 		Tetrominoes shape = Tetrominoes.NOSHAPE;
 		coordinates = new int[4][2];
 		currentShape = shape;
-		color = Color.RED;
+		fillColor = new Color(0xFFFFFF);
+		outlineColor = new Color(0xFFFFFF);
 		blockCoordinates = new int[4][2];
 		loadRotationCoordinates();
+	}
+	
+	public void setHeldShape(Tetrominoes heldShape) {
+		this.heldShape = heldShape;
+	}
+	
+	public Tetrominoes getHeldShape() {
+		return this.heldShape;
 	}
 	
 	public void setMaxColumns(int maxColumns) {
@@ -158,6 +167,12 @@ public class ShapeModel {
 	private void loadRotationCoordinates() {
 		// ALL ROTATIONS FROM 0, 1, ..., N ARE CLOCKWISE.
 		rotationCoords = new HashMap<>();
+		
+		int[][][] NOSHAPEcoords = {
+				{{0,0}, {0,0}, {0,0}, {0,0}}  // DEFAULT
+		};
+		rotationCoords.put(Tetrominoes.NOSHAPE, NOSHAPEcoords);
+		
 		int[][][] TSHAPEcoords = {
 				{{-1,0}, {0,0}, {1,0}, {0,1}},  // DEFAULT
 				{{0,1}, {0,0}, {0,-1}, {1,0}},  // 90 DEG 
@@ -216,9 +231,10 @@ public class ShapeModel {
 			setColumn(block, column);
 			setRow(block, row);
 		}
+		initColors();
 	}
 
-	public Tetrominoes getShape() {
+	public Tetrominoes getCurrentShape() {
 		return currentShape;
 	}
 	
@@ -226,37 +242,64 @@ public class ShapeModel {
 		return null;
 	}
 	
-	public void setColor(Color color) {
-		this.color = color;
+	public void setColor(Color fillColor, Color outlineColor) {
+		this.fillColor = fillColor;
+		this.outlineColor = outlineColor;
 	}
 	
-	public Color getColor() {
+	/**
+	 * @return Array of 2 colors. First is the fill color. Second is the outline color.
+	 */
+	public void initColors() {
+		Color[] colors = new Color[2];
 		switch (currentShape.ordinal()) {
 			case 1:
-				setColor(Color.RED);
+				setFillColor(new Color(0xFF3333)); // Red
+				setOutlineColor(new Color(0xB22424));
 				break;
 			case 2:
-				setColor(Color.CYAN);
+				setFillColor(new Color(0x4DFF4D)); // Green
+				setOutlineColor(new Color(0x268026));
 				break;
 			case 3:
-				setColor(Color.YELLOW);
+				setFillColor(new Color(0x5CD6FF)); // Blue
+				setOutlineColor(new Color(0x378099));
 				break;
 			case 4:
-				setColor(Color.GREEN);
+				setFillColor(new Color(0xFFA3FF)); // Pink
+				setOutlineColor(new Color(0x996299));
 				break;
 			case 5:
-				setColor(Color.ORANGE);
+				setFillColor(new Color(0xA3FFEC)); // Cyan
+				setOutlineColor(new Color(0xB26B00));
 				break;
 			case 6:
-				setColor(Color.PINK);
+				setFillColor(new Color(0xC2A3FF));
+				setOutlineColor(new Color(0x615280));
 				break;
 			case 7:
-				setColor(Color.MAGENTA);
+				setFillColor(new Color(0x66FFE0));
+				setOutlineColor(new Color(0x338070));
 				break;
 			default:
 				break;
 		}
-		return color;
+	}
+	
+	public void setFillColor(Color color) {
+		this.fillColor = color;
+	}
+	
+	public Color getFillColor() {
+		return this.fillColor.darker();
+	}
+	
+	public void setOutlineColor(Color color) {
+		this.outlineColor = color;
+	}
+	
+	public Color getOutlineColor() {
+		return this.outlineColor;
 	}
 	
 	public void setRow(int block, int row) {
@@ -279,12 +322,12 @@ public class ShapeModel {
 		Random r = new Random();
 		if(nextShapeIndex == 0) {
 			// First shape generation
-			nextShapeIndex = r.nextInt(Tetrominoes.values().length-1)+1;
+			nextShapeIndex = r.nextInt(Tetrominoes.values().length-2)+1;
 		}
 		
 		coordinatesIndex = 0;
 		newShape(Tetrominoes.values()[nextShapeIndex]);
-		nextShapeIndex  = r.nextInt(Tetrominoes.values().length-1)+1;
+		nextShapeIndex  = r.nextInt(Tetrominoes.values().length-2)+1;
 	}
 	
 	public int getNextShapeIndex() {

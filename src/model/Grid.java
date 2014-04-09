@@ -1,6 +1,9 @@
 package model;
 
+import java.awt.Color;
+
 import controller.GameController;
+import model.ShapeModel.Tetrominoes;
 import model.ShapeModel.Type;
 
 /*
@@ -17,10 +20,14 @@ public class Grid {
 	private ScoreModel score;
 	private int row, column;
 	private GameController controller;
+	private Tetrominoes currentShape;
+	private Tetrominoes heldShape;
+	private boolean canHoldShape = true;
 	
 	// Constructs an instance of Grid with a blank grid of cells with 
 	// 1 shape and 1 shadow.
 	public Grid(ScoreModel score, GameController controller) {
+		this.heldShape = Tetrominoes.NOSHAPE;
 		this.controller = controller;
 		this.score = score;
 		shape = new ShapeModel(Type.CURRENT_SHAPE);
@@ -31,6 +38,25 @@ public class Grid {
 				cells[row][column] = new Cell(Cell.EMPTY);
 			}
 		}
+	}
+	
+	public boolean canHoldShape() {
+		return canHoldShape;
+	}
+	
+	public Tetrominoes getHeldShape() {
+		return heldShape;
+	}
+	
+	public void holdShape() {
+		Tetrominoes currentShape = shape.getCurrentShape();
+		emptyCells();
+		if(heldShape != Tetrominoes.NOSHAPE) {
+			shape.newShape(heldShape);
+		} else 
+			shape.randomShape();
+		heldShape = currentShape;
+		canHoldShape = false;
 	}
 	
 	// Returns the current shape model.
@@ -57,9 +83,9 @@ public class Grid {
 			for (int block = 0; block < 4; block++) {
 				column = shape.getBlockColumn(block);
 				row = shape.getBlockRow(block);
+
 				Cell cell = getCell(row, column);
 				cell.setState(Cell.EMPTY);
-				cell.setColor(null);
 				if(direction == ShapeModel.LEFT)
 					shape.setColumn(block, column-1);
 				else if (direction == ShapeModel.RIGHT) 
@@ -75,7 +101,6 @@ public class Grid {
 			row = shape.getBlockRow(block);
 			column = shape.getBlockColumn(block);
 			getCell(row, column).setState(Cell.EMPTY);;
-			getCell(row, column).setColor(null);
 		}
 	}
 	
@@ -168,7 +193,6 @@ public class Grid {
 	public void clearRow(int r) {
 		for (int column=0; column<10; column++) {
 			cells[r][column].setState(Cell.EMPTY);
-			cells[r][column].setColor(null);
 		}
 		
 		for(int row=r; row>0; row--) {
@@ -177,7 +201,8 @@ public class Grid {
 				Cell above = cells[row-1][column];
 				if(above.getState() != Cell.TETROMINO) {
 					cell.setState(above.getState());
-					cell.setColor(above.getColor());
+					cell.setFillColor(above.getFillColor());
+					cell.setOutlineColor(above.getOutlineColor());
 				}
 			}
 		}
@@ -206,7 +231,7 @@ public class Grid {
 	 */
 	private void updateShadowPosition() {
 		clearShadow();
-		shadow.newShape(shape.getShape());
+		shadow.newShape(shape.getCurrentShape());
 
 		for (int block = 0; block < 4; block++) {
 			shadow.setRow(block, shape.getBlockRow(block));
@@ -220,6 +245,10 @@ public class Grid {
 			column = shadow.getBlockColumn(block);
 			cell = getCell(row, column);
 			cell.setState(Cell.SHADOW);
+			Color fill = shape.getFillColor();
+			cell.setFillColor(fill.brighter().brighter());
+			Color outline = shape.getOutlineColor();
+			cell.setOutlineColor(outline.brighter());
 		}
 	}
 	
@@ -248,7 +277,8 @@ public class Grid {
 				column = shape.getBlockColumn(block);
 				cell = getCell(row, column);
 				cell.setState(Cell.TETROMINO);
-				cell.setColor(shape.getColor());
+				cell.setFillColor(shape.getFillColor());
+				cell.setOutlineColor(shape.getOutlineColor());
 			} catch(ArrayIndexOutOfBoundsException ex) {
 				continue;
 			}
@@ -317,11 +347,14 @@ public class Grid {
 		for (int block = 0; block < 4; block++) {
 			row = shape.getBlockRow(block);
 			column = shape.getBlockColumn(block);
+
 			cell = getCell(row, column);
 			cell.setState(Cell.NOT_EMPTY);
-			cell.setColor(shape.getColor());
+			cell.setFillColor(shape.getFillColor());
+			cell.setOutlineColor(shape.getOutlineColor());
 		}
 		shape.randomShape();
+		canHoldShape = true;
 	}
 	
 	/**

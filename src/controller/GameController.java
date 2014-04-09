@@ -8,7 +8,8 @@ import java.awt.event.KeyListener;
 import javax.swing.Timer;
 
 import view.game.GameView;
-import view.game.NextShapeView;
+import view.game.InfoView;
+import view.game.ShapeView;
 import view.menu.Tetris;
 import model.Cell;
 import model.Grid;
@@ -24,29 +25,30 @@ public class GameController implements ActionListener, KeyListener {
 	private Grid grid;
 	private ScoreModel score;
 	private ShapeModel shapeModel;
-	private NextShapeView nextShapeView;
+	private InfoView infoView;
 	public GameStates gameState = GameStates.STOPPED;
 	private int elapsed = 0;
 	private Tetrominoes nextShape = Tetrominoes.NOSHAPE;
+	private boolean holdAllowed = true;
 	
 	public GameController(Tetris parent) {
-		nextShapeView = new NextShapeView();
 		gameView = new GameView(parent, grid);
 		gameView.addKeyListener(this);
 		gameView.requestFocusInWindow();
 		gameView.requestFocus();
+		infoView = new InfoView();
 	}
 	
 	public GameView getGameView() {
 		return gameView;
 	}
 	
-	public NextShapeView getNextShapeView() {
-		return nextShapeView;
+	public InfoView getInfoView() {
+		return infoView;
 	}
 	
 	public void startGame() {
-		score = new ScoreModel(10);
+		score = new ScoreModel(1);
 		grid = new Grid(score, this);
 
 		gameView.setGrid(grid);
@@ -55,11 +57,13 @@ public class GameController implements ActionListener, KeyListener {
 		shapeModel.randomShape();
 		timer.start();
 		gameState = GameStates.STARTED;
+		gameView.playSound();
 	}
 	
 	public void stopGame() {
 		timer.stop();
 		gameState = GameStates.STOPPED;
+		gameView.stopSound();
 	}
 
 	public void keyPressed(KeyEvent event) {
@@ -81,19 +85,32 @@ public class GameController implements ActionListener, KeyListener {
 				break;
 			case KeyEvent.VK_SPACE:
 				grid.hardDrop(grid.getShapeModel());
+				elapsed = 0;
 				break;
 			case KeyEvent.VK_DOWN:
 				grid.nextLine(grid.getShapeModel());
+				elapsed = 0;
 				break;
 			case KeyEvent.VK_ESCAPE:
-				stopGame();
+				gameState = GameStates.STOPPED;
+				infoView.getHeldShapeView().setShape(Tetrominoes.NOSHAPE);
+				gameView.stopSound();
+				break;
 			case KeyEvent.VK_ENTER:
 				if(gameState == gameState.STOPPED) {
 					startGame();
 				}
 				break;
+			case KeyEvent.VK_SHIFT:
+				// Hold shape
+				if(grid.canHoldShape()) {
+					grid.holdShape();
+					infoView.getHeldShapeView().setShape(grid.getHeldShape());
+				}
+				break;
 		}
 	}
+	
 
 	public void keyReleased(KeyEvent event) {}
 	public void keyTyped(KeyEvent event) {}
@@ -109,12 +126,14 @@ public class GameController implements ActionListener, KeyListener {
 				grid.nextLine(grid.getShapeModel());
 				elapsed = 0;
 			}
-			elapsed += 10;
-			gameView.updateScore(score.getPoints());
-			gameView.updateLevel(score.getLevel());
+			elapsed += 1;
 			nextShape = Tetrominoes.values()[shapeModel.getNextShapeIndex()];
-			nextShapeView.setNextShape(nextShape);
+			infoView.getNextShapeView().setShape(nextShape);
 			gameView.repaint();
+			infoView.updateLevel(score.getLevel());
+			infoView.updateScore(score.getPoints());
+		} else {
+			gameView.stopSound();
 		}
 	}
 

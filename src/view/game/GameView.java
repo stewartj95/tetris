@@ -7,7 +7,11 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.io.File;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -26,9 +30,9 @@ public class GameView extends JPanel {
 							new JLabel("Block 4 row:    column:    ")};
 	JLabel gameOverLabel, levelLabel, scoreLabel;
 	Grid grid;
+	Clip audio;
 	
 	public GameView(Tetris parent, Grid grid) {
-		setFocusTraversalKeysEnabled(false); 
 		setFocusable(true);
 		setLayout(new BorderLayout());
 
@@ -39,17 +43,30 @@ public class GameView extends JPanel {
 		scoreLabel = new JLabel();
 		scoreLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
 		
-		JPanel scorePanel = new JPanel();
-		scorePanel.setLayout(new GridLayout(1,3));
-		scorePanel.add(levelLabel);
-		scorePanel.add(new JLabel(""));
-		scorePanel.add(scoreLabel);
-
-		add(scorePanel, BorderLayout.NORTH);
 		add(gameOverLabel, BorderLayout.CENTER);
 		setDoubleBuffered(true);
+		setBackground(new Color(0xCBCBCB));
 	}
 	
+	public void playSound() {
+		try {
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("audio/tetris_metal.wav").getAbsoluteFile());
+	        audio = AudioSystem.getClip();
+	        audio.open(audioInputStream);
+	        audio.start();
+	    } catch(Exception ex) {
+	        System.out.println("Error with playing sound.");
+	        ex.printStackTrace();
+	    }
+	}
+	
+	public void stopSound() {
+		audio.stop();
+		audio.drain();
+		audio.close();
+	}
+	
+	@Override
 	public void setSize(int width, int height) {
 		shapeWidth = width / 10;
 		shapeHeight = height / 22;
@@ -58,20 +75,11 @@ public class GameView extends JPanel {
 		boardWidth = width;
 		boardHeight = height;
 
-		setMaximumSize(new Dimension(boardWidth, boardHeight));
-		setMinimumSize(new Dimension(boardWidth, boardHeight));
+		setPreferredSize(new Dimension(boardWidth, boardHeight));
 	}
 	
 	public void setGrid(Grid grid) {
 		this.grid = grid;
-	}
-	
-	public void updateLevel(int level) {
-		levelLabel.setText("Level: " + level);
-	}
-	
-	public void updateScore(int score) {
-		scoreLabel.setText("Score: " + score);
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -79,14 +87,20 @@ public class GameView extends JPanel {
 		try {
 			Cell[][] cells = grid.getCells();
 			for(int row=0; row<22; row++) {
+				g.setColor(new Color(0xA2A2A2));
+//				g.drawLine(0, row*shapeHeight, boardWidth, row*shapeHeight);
 				for(int column=0; column<10; column++) {
+					g.setColor(new Color(0xA2A2A2));
 					Cell cell = cells[row][column];
 					if(cell.getState() != Cell.EMPTY) {
 						int x = column * shapeWidth;
 						int y = row * shapeHeight;
-						g.setColor(cell.getColor());
+						g.setColor(cell.getFillColor());
 						g.fillRect(x, y, shapeWidth, shapeHeight);
+						g.setColor(cell.getOutlineColor().darker().darker());
+						g.drawRect(x, y, shapeWidth, shapeHeight);
 					}
+//					g.drawLine(column*shapeWidth, 0, column*shapeWidth, boardHeight);
 				}
 			}
 		} catch (NullPointerException ex) {
