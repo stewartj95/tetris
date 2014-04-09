@@ -6,7 +6,11 @@ A Tetris clone made for fun and practice.
 BUGS
 ==========
 
-No significant bugs at the moment.
+1. Timer is not reliable or consistent
+    - Sometimes the speed is fine
+    - Sometimes the speed fluctuates
+    - Sometimes the speed is very slow when it should be fast
+    - Possibly due to problem with Score object or how time elapsed is calculated
 
 =============
 TO IMPLEMENT
