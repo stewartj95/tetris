@@ -19,6 +19,5 @@ MUST
 
 COULD
 =====
-1. Hold tetromino
-2. Choose a level in the main menu
-3. Save highscores and view leaderboard
+1. Choose a level in the main menu
+2. Save highscores and view leaderboard
