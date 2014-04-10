@@ -21,7 +21,7 @@ public class GameController implements ActionListener, KeyListener {
 	
 	public enum GameStates {STARTED, STOPPED};
 	private GameView gameView; 
-	private Timer timer = new Timer(1, this);
+	private Timer timer = new Timer(10, this);
 	private Grid grid;
 	private ScoreModel score;
 	private ShapeModel shapeModel;
@@ -126,7 +126,7 @@ public class GameController implements ActionListener, KeyListener {
 				grid.nextLine(grid.getShapeModel());
 				elapsed = 0;
 			}
-			elapsed += 1;
+			elapsed += 10;
 			nextShape = Tetrominoes.values()[shapeModel.getNextShapeIndex()];
 			infoView.getNextShapeView().setShape(nextShape);
 			gameView.repaint();

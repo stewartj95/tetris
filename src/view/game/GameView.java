@@ -49,21 +49,21 @@ public class GameView extends JPanel {
 	}
 	
 	public void playSound() {
-		try {
-	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("audio/tetris_metal.wav").getAbsoluteFile());
-	        audio = AudioSystem.getClip();
-	        audio.open(audioInputStream);
-	        audio.start();
-	    } catch(Exception ex) {
-	        System.out.println("Error with playing sound.");
-	        ex.printStackTrace();
-	    }
+//		try {
+//	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("audio/tetris_metal.wav").getAbsoluteFile());
+//	        audio = AudioSystem.getClip();
+//	        audio.open(audioInputStream);
+//	        audio.start();
+//	    } catch(Exception ex) {
+//	        System.out.println("Error with playing sound.");
+//	        ex.printStackTrace();
+//	    }
 	}
 	
 	public void stopSound() {
-		audio.stop();
-		audio.drain();
-		audio.close();
+//		audio.stop();
+//		audio.drain();
+//		audio.close();
 	}
 	
 	@Override
